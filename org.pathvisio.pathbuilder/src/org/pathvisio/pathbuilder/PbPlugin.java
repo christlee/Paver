@@ -1,45 +1,31 @@
 package org.pathvisio.pathbuilder;
 
-
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JTabbedPane;
+import org.pathvisio.core.preferences.Preference;
 
-import org.pathvisio.core.model.DataNodeType;
-import org.pathvisio.core.model.ObjectType;
-import org.pathvisio.core.model.Pathway;
-import org.pathvisio.core.model.PathwayElement;
-
-import org.bridgedb.DataSource;
-import org.bridgedb.IDMapperStack;
-import org.bridgedb.Xref;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
-import org.pathvisio.gui.SwingEngine;
 
-import org.pathvisio.pathbuilder.construct.Constructor;
-
-public class Activator implements Plugin, BundleActivator {
+public class PbPlugin implements Plugin, BundleActivator {
 
 	private static String PLUGIN_NAME = "PathBuilder";
 	
 	private selectAction action;
 	private PvDesktop desktop;
-	private SwingEngine swingEngine;
 	private JMenu subMenu;
 	private static BundleContext context;
 
 	@Override
 	public void init(PvDesktop desktop) {
 		this.desktop = desktop;
-		swingEngine = desktop.getSwingEngine();
 		action = new selectAction();
 		subMenu = new JMenu();
 		subMenu.setText(PLUGIN_NAME);
@@ -55,19 +41,31 @@ public class Activator implements Plugin, BundleActivator {
 			putValue(NAME,"Build pathway");
 		}
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent arg0) 
+		{
+			JFrame frame = new JFrame("Build pathway from file");
 			
-			Set<Xref> refs = new HashSet<Xref>();
-			
-			Xref refa = new Xref("183", DataSource.getBySystemCode("L"));
-			Xref refb = new Xref("HMDB01035", DataSource.getBySystemCode("Ch"));
-			refs.add(refa);
-			refs.add(refb);
-			IDMapperStack db = swingEngine.getGdbManager().getCurrentGdb();
-			Pathway pwy = swingEngine.getEngine().getActivePathway();
-			Constructor construct = new Constructor(pwy, refs, db);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.getContentPane().add(new InputWindow(desktop.getSwingEngine()), BorderLayout.CENTER);
+			frame.pack();
+			frame.setLocationRelativeTo(desktop.getFrame());
+			frame.setVisible(true);
 		}
 		
+	}
+	
+	public static enum PbPreference implements Preference
+	{
+		PB_PLUGIN_TXT_FILE(System.getProperty("user.home") + File.separator + "text_file.txt");
+		
+		
+
+		private final String defaultVal;
+		
+		PbPreference (String _defaultVal) { defaultVal = _defaultVal; }
+		
+		@Override
+		public String getDefault() { return defaultVal; }
 	}
 
 	
