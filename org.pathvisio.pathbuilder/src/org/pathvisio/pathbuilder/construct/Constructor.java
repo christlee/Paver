@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.IDMapperStack;
 import org.bridgedb.Xref;
@@ -18,6 +19,7 @@ import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.pathbuilder.Connection;
+import org.pathvisio.pathbuilder.Node;
 
 //TODO: This package should take care of putting the nodes and edges on the screen in a structurized manner
 public class Constructor {
@@ -34,9 +36,13 @@ public class Constructor {
 	private static int PLUSY = 50;
 	
 	
-	public Constructor(Pathway pwy, List<Connection> connections, IDMapperStack db){
+	public Constructor(Pathway pwy, IDMapperStack db){
 		this.db = db;
 		this.pwy = pwy;
+		
+	}
+	
+	public void plotConnections(List<Connection> connections){
 		nodes = new HashMap<String,Xref>();
 		int i = 0;
 		int j = 0;
@@ -51,6 +57,8 @@ public class Constructor {
 				nodes.put(sp, start);
 				try {
 					PathwayElement pel = createNode(start);
+					String label = start.getDataSource().getSystemCode() + ":" + start.getId();
+					pel.setTextLabel(label);
 					drawNode(i, 0, pel);
 					pels.put(start,pel);
 				} catch (IDMapperException e) {
@@ -67,6 +75,8 @@ public class Constructor {
 				try {
 					PathwayElement pel = createNode(end);
 					drawNode(i, j, pel);
+					String label = end.getDataSource().getSystemCode() + ":" + end.getId();
+					pel.setTextLabel(label);
 					pels.put(end,pel);
 				} catch (IDMapperException e) {
 					// TODO Auto-generated catch block
@@ -79,8 +89,31 @@ public class Constructor {
 			lines.add(line);
 			i++;
 		}
-		plot();
+		for (Entry<Xref,PathwayElement> entry : pels.entrySet()){
+			pwy.add(entry.getValue());
+		}
+		for (PathwayElement line : lines){
+			pwy.add(line);
+		}
 	}
+	
+	public void plotNodes(List<Node> nodes){
+		int i = 0;
+		for (Node node: nodes){
+			try {
+				PathwayElement pel = createNode(new Xref(node.getId(),DataSource.getBySystemCode(node.getSysCode())));
+				pel.setTextLabel(node.getName());
+				drawNode(i,0,pel);
+				pwy.add(pel);
+				i++;
+			} catch (IDMapperException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
 	void drawNode(int i, int j, PathwayElement pel){
 		int x = X + PLUSX * j;
 		int y = Y + PLUSY * i;
@@ -125,29 +158,20 @@ public class Constructor {
 	}
 	
 	void plot(){
-		for (Entry<Xref,PathwayElement> entry : pels.entrySet()){
-			pwy.add(entry.getValue());
-		}
-		for (PathwayElement line : lines){
-			pwy.add(line);
-		}
+		
 	}
 	
 	PathwayElement createNode(Xref ref) throws IDMapperException{
 		PathwayElement pel;
 		pel = PathwayElement.createPathwayElement(ObjectType.DATANODE);
 		pel.setGraphId(pwy.getUniqueGroupId());
+		pel.setDataNodeType(ref.getDataSource().getType());
+		
 		if (ref.getDataSource().isMetabolite()){
-			pel.setDataNodeType(DataNodeType.METABOLITE);
 			pel.setColor(Color.BLUE);
-		}
-		else {
-			pel.setDataNodeType(DataNodeType.GENEPRODUCT);
 		}
 		pel.setElementID(ref.getId());
 		pel.setDataSource(ref.getDataSource());
-		String label = ref.getDataSource().getSystemCode() + ":" + ref.getId();
-		pel.setTextLabel(label);
 		return pel;
 	}
 }

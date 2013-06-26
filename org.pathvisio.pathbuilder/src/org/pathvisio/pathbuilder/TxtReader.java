@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bridgedb.DataSource;
+import org.bridgedb.DataSourcePatterns;
 import org.bridgedb.Xref;
 
 /**
@@ -18,28 +19,28 @@ import org.bridgedb.Xref;
 */
 public class TxtReader 
 {
-	List<Connection> cons;
+	File file;
 	private static String NAME_SEP = ":";
 	private static String ITEM_SEP = "\t";
 	
-	public TxtReader()
+	public TxtReader(File file)
 	{
-		cons = new ArrayList<Connection>();
+		this.file = file;
 	}
 	
-	public boolean readFile(File file)
+	public List<Connection> getConnections()
 	{
-		cons.clear();
+		List<Connection> cons = new ArrayList<Connection>();
 		// line string
 		String line; 
 		// the array to return
 		String[] currentRow;
-			
+					
 		try 
 		{
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
-			
+					
 			// continue reading lines until EOF is reached
 			while((line = br.readLine()) != null)
 			{
@@ -47,7 +48,7 @@ public class TxtReader
 			   	String[] start = currentRow[0].split(NAME_SEP);
 			   	Xref startRef = new Xref(start[1], DataSource.getBySystemCode(start[0]));
 			   	String arrow = "normal";
-			   	
+				   	
 			   	String[] stop = currentRow[2].split(NAME_SEP);
 			   	Xref stopRef = new Xref(stop[1], DataSource.getBySystemCode(stop[0]));
 			   	
@@ -60,13 +61,48 @@ public class TxtReader
 		catch(Exception e) 
 		{
 			System.out.println("Exception: " + e);
-		}
-		return true;
+		}		
+	return cons;
 	}
-	
-	public List<Connection> getConnections()
-	{
-		return cons;
-	}		
+	public List<Node> getNodes(){
+		List<Node> nodes = new ArrayList<Node>();
+		// line string
+		String line; 
+		// the array to return
+		String[] currentRow;
+							
+		try 
+		{
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+							
+			// continue reading lines until EOF is reached
+			while((line = br.readLine()) != null)
+			{
+				String[] att = line.split("\t");
+				Node node = new Node();
+				if (att.length==3){
+					node.setName(att[0]);
+					node.setId(att[1]);
+					node.setSysCode(att[2]);
+				}
+				else if (att.length==2){
+					node.setName(att[0]);
+					node.setId(att[1]);
+					node.setSysCode(DataSourcePatterns.getDataSourceMatches(att[1]).toArray()[0].toString());
+				}
+				
+				nodes.add(node);
+					   	   	
+			}   
+			fr.close();
+		}		     
+		catch(Exception e) 
+		{
+			System.out.println("Exception: " + e);
+		}
+		
+		return nodes;
+	}
 }
 
