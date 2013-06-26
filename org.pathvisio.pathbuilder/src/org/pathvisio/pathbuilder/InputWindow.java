@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,8 +29,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import org.bridgedb.DataSource;
+import org.bridgedb.DataSourcePatterns;
 import org.bridgedb.IDMapperStack;
+import org.bridgedb.Xref;
 import org.pathvisio.core.model.Pathway;
+import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
@@ -38,6 +43,7 @@ import org.pathvisio.pathbuilder.construct.Constructor;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.xml.internal.bind.api.Bridge;
 
 public class InputWindow extends JPanel implements ActionListener{
 	
@@ -52,6 +58,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private SwingEngine swingEngine;
 	private JLabel nodeNames;
 	private JLabel connectionNames;
+
 	
 	static String byFileString = "By File";
     static String byTableString = "By Table";
@@ -225,21 +232,83 @@ public class InputWindow extends JPanel implements ActionListener{
 	
 	private void doBuild() 
 	{	
-		final File textF = new File(txtFile.getText());
-		//check if the file exists then read in file
-		if (!textF.exists())
-		{
-			showMessageDialog("Text File not found");
-			return;
+		List<Connection> cons = new ArrayList<Connection>();
+		List<Node> nodes = new ArrayList<Node>();
+		if (byFileButton.isSelected()){
+			final File textF = new File(txtFile.getText());
+			//check if the file exists then read in file
+			if (!textF.exists())
+			{
+				showMessageDialog("Text File not found");
+				return;
+			}
+			PreferenceManager.getCurrent().set(PbPreference.PB_PLUGIN_TXT_FILE, txtFile.getText());
+			TxtReader read = new TxtReader(textF);
+			if (conButton.isSelected()){
+				cons = read.getConnections();	
+			}
+			else {
+				nodes = read.getNodes();
+			}
 		}
-		PreferenceManager.getCurrent().set(PbPreference.PB_PLUGIN_TXT_FILE, txtFile.getText());
-		TxtReader read = new TxtReader();
-		read.readFile(textF);
-		List<Connection> cons = read.getConnections();
+		else if (conButton.isSelected()){
+			cons = getCons();
+		}
+		else {
+			nodes = getNodes();
+		}
 		
 		IDMapperStack db = swingEngine.getGdbManager().getCurrentGdb();
 		Pathway pwy = swingEngine.getEngine().getActivePathway();
-		new Constructor(pwy, cons, db);
+		Constructor construct = new Constructor(pwy, db);
+		if (conButton.isSelected()){
+			construct.plotConnections(cons);
+		}
+		else {
+			construct.plotNodes(nodes);
+		}
+	}
+	
+	private List<Node> getNodes(){
+		List<Node> nodes = new ArrayList<Node>();
+		String[] geneList = inputText.getText().split("\r\n|\r|\n");
+		for (int i=0; i<geneList.length;i++){
+			String[] att = geneList[i].split("\t");
+			Node node = new Node();
+			if (att.length==3){
+				node.setName(att[0]);
+				node.setId(att[1]);
+				node.setSysCode(att[2]);
+			}
+			else if (att.length==2){
+				node.setName(att[0]);
+				node.setId(att[1]);
+				node.setSysCode(DataSourcePatterns.getDataSourceMatches(att[1]).toArray()[0].toString());
+			}
+			else{
+				showMessageDialog("Incorrect Input");
+			}
+			
+			nodes.add(node);
+		}
+		return nodes;
+	}
+	
+	private List<Connection> getCons(){
+		List<Connection> cons = new ArrayList<Connection>();
+		String[] geneList = inputText.getText().split("\r\n|\r|\n");
+		for (int i=0; i<geneList.length;i++){
+			String[] att = geneList[i].split("\t");
+			String[] start = att[0].split(":");
+			Xref startRef = new Xref(start[1],DataSource.getBySystemCode(start[0]));
+			
+			String[] end = att[2].split(":");
+			Xref endRef = new Xref(end[1],DataSource.getBySystemCode(end[0]));
+			
+			Connection con= new Connection(startRef,endRef,"Normal");
+			cons.add(con);
+		}
+		return cons;
 	}
 	
 	public void actionPerformed(ActionEvent e) {

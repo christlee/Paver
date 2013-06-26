@@ -43,7 +43,7 @@ public class PbPlugin implements Plugin, BundleActivator {
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
 		{
-			JFrame frame = new JFrame("Build pathway from file");
+			JFrame frame = new JFrame("Build pathway");
 			
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.getContentPane().add(new InputWindow(desktop.getSwingEngine()), BorderLayout.CENTER);
