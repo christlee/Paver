@@ -28,9 +28,10 @@ public class Constructor {
 	Pathway pwy;
 	Map<Xref,PathwayElement> pels;
 	Set<PathwayElement> lines;
+	double centerX;
+	
 	private static int HEIGHT = 20;
 	private static int WEIGHT = 80;
-	private static int X = 50;
 	private static int Y = 50;
 	private static int PLUSX = 120;
 	private static int PLUSY = 50;
@@ -39,7 +40,7 @@ public class Constructor {
 	public Constructor(Pathway pwy, IDMapperStack db){
 		this.db = db;
 		this.pwy = pwy;
-		
+		centerX = 50;
 	}
 	
 	public void plotConnections(List<Connection> connections){
@@ -115,7 +116,9 @@ public class Constructor {
 	}
 	
 	void drawNode(int i, int j, PathwayElement pel){
-		int x = X + PLUSX * j;
+		double start = centerX - .5 * PLUSX;
+		double x = start + PLUSX * j;
+		
 		int y = Y + PLUSY * i;
 		pel.setMCenterX(x);
 		pel.setMCenterY(y);
@@ -133,6 +136,7 @@ public class Constructor {
 			line.setMEndY(endnode.getMCenterY());
 			line.setMEndX(endnode.getMCenterX() - endnode.getMWidth() / 2);
 		} else if (startnode.getMCenterX() > endnode.getMCenterX()) {
+			line.setMStartY(startnode.getMCenterY());
 			line.setMStartX(startnode.getMCenterX() - startnode.getMWidth() / 2);
 			line.setMEndY(endnode.getMCenterY());
 			line.setMEndX(endnode.getMCenterX() + endnode.getMWidth() / 2);
@@ -157,8 +161,8 @@ public class Constructor {
 		return line;
 	}
 	
-	void plot(){
-		
+	public void setWidth(int width){
+		centerX = .5 * width;
 	}
 	
 	PathwayElement createNode(Xref ref) throws IDMapperException{

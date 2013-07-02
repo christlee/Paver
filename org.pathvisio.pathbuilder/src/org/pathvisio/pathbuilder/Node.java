@@ -2,6 +2,12 @@ package org.pathvisio.pathbuilder;
 
 import org.bridgedb.DataSource;
 import org.bridgedb.Xref;
+/**
+ * 
+ * 
+ * @author christ leemans
+ *
+ */
 
 public class Node {
 	String sysCode;

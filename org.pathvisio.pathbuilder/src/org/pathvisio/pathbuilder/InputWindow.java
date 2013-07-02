@@ -36,6 +36,8 @@ import org.bridgedb.Xref;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.preferences.PreferenceManager;
+import org.pathvisio.core.view.LayoutType;
+import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.pathbuilder.PbPlugin.PbPreference;
@@ -58,15 +60,21 @@ public class InputWindow extends JPanel implements ActionListener{
 	private SwingEngine swingEngine;
 	private JLabel nodeNames;
 	private JLabel connectionNames;
+	private int side;
 
 	
 	static String byFileString = "By File";
     static String byTableString = "By Table";
     static String conString = "Connections";
     static String nodesString = "Nodes";
-	
-	InputWindow(SwingEngine swingEngine){
-		this.swingEngine = swingEngine;
+    
+    /**
+	 * The input window.<p>
+	 * Class creates a frame with the elements to enable user input.
+	 */
+	InputWindow(PvDesktop desktop){
+		this.swingEngine = desktop.getSwingEngine();
+		side=desktop.getSideBarTabbedPane().getWidth();
 		
 		txtFile = new JTextField();
 		txtFile.setText(PreferenceManager.getCurrent().get(PbPreference.PB_PLUGIN_TXT_FILE));
@@ -257,10 +265,10 @@ public class InputWindow extends JPanel implements ActionListener{
 		else {
 			nodes = getNodes();
 		}
-		
 		IDMapperStack db = swingEngine.getGdbManager().getCurrentGdb();
 		Pathway pwy = swingEngine.getEngine().getActivePathway();
 		Constructor construct = new Constructor(pwy, db);
+		construct.setWidth(swingEngine.getFrame().getWidth()-side);
 		if (conButton.isSelected()){
 			construct.plotConnections(cons);
 		}
