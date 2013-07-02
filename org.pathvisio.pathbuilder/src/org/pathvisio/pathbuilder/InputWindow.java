@@ -18,6 +18,7 @@ import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -60,6 +61,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private SwingEngine swingEngine;
 	private JLabel nodeNames;
 	private JLabel connectionNames;
+	private JFrame frame;
 	private int side;
 
 	
@@ -72,8 +74,9 @@ public class InputWindow extends JPanel implements ActionListener{
 	 * The input window.<p>
 	 * Class creates a frame with the elements to enable user input.
 	 */
-	InputWindow(PvDesktop desktop){
+	InputWindow(PvDesktop desktop,JFrame frame){
 		this.swingEngine = desktop.getSwingEngine();
+		this.frame = frame;
 		side=desktop.getSideBarTabbedPane().getWidth();
 		
 		txtFile = new JTextField();
@@ -155,7 +158,7 @@ public class InputWindow extends JPanel implements ActionListener{
         settingsPanel.add(typeBox,cc.xy(6, 2));
         
 		//browser Panel
-		browsePanel.setBorder (BorderFactory.createTitledBorder (etch, "GO!"));
+		browsePanel.setBorder (BorderFactory.createTitledBorder (etch, "input File"));
 		browsePanel.setLayout(browseLayout);
 				
 		browsePanel.add(new JLabel ("text file:"), cc.xy(2,2));
@@ -165,7 +168,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		btnBrowseFile.addActionListener(new BrowseButtonActionListener (txtFile, this, JFileChooser.FILES_ONLY));
 		browsePanel.add(btnBrowseFile, cc.xy(6,2));
 				
-		btnBuild = new JButton("Read Text file");
+		btnBuild = new JButton("GO!");
 	
 		btnBuild.addActionListener(new ActionListener()
 		{
@@ -216,6 +219,10 @@ public class InputWindow extends JPanel implements ActionListener{
 		add(panel, BorderLayout.CENTER);
 	}
 	
+	InputWindow(){
+		
+	}
+	
 	public JPopupMenu processMouseEvent()
 	{
 		JPopupMenu menu = new JPopupMenu();
@@ -252,6 +259,7 @@ public class InputWindow extends JPanel implements ActionListener{
 			}
 			PreferenceManager.getCurrent().set(PbPreference.PB_PLUGIN_TXT_FILE, txtFile.getText());
 			TxtReader read = new TxtReader(textF);
+			read.addWindow(this);
 			if (conButton.isSelected()){
 				cons = read.getConnections();	
 			}
@@ -275,28 +283,14 @@ public class InputWindow extends JPanel implements ActionListener{
 		else {
 			construct.plotNodes(nodes);
 		}
+		frame.dispose();
 	}
 	
 	private List<Node> getNodes(){
 		List<Node> nodes = new ArrayList<Node>();
 		String[] geneList = inputText.getText().split("\r\n|\r|\n");
 		for (int i=0; i<geneList.length;i++){
-			String[] att = geneList[i].split("\t");
-			Node node = new Node();
-			if (att.length==3){
-				node.setName(att[0]);
-				node.setId(att[1]);
-				node.setSysCode(att[2]);
-			}
-			else if (att.length==2){
-				node.setName(att[0]);
-				node.setId(att[1]);
-				node.setSysCode(DataSourcePatterns.getDataSourceMatches(att[1]).toArray()[0].toString());
-			}
-			else{
-				showMessageDialog("Incorrect Input");
-			}
-			
+			Node node = TxtReader.readSingleNode(geneList[i],this);
 			nodes.add(node);
 		}
 		return nodes;
@@ -306,21 +300,13 @@ public class InputWindow extends JPanel implements ActionListener{
 		List<Connection> cons = new ArrayList<Connection>();
 		String[] geneList = inputText.getText().split("\r\n|\r|\n");
 		for (int i=0; i<geneList.length;i++){
-			String[] att = geneList[i].split("\t");
-			String[] start = att[0].split(":");
-			Xref startRef = new Xref(start[1],DataSource.getBySystemCode(start[0]));
-			
-			String[] end = att[2].split(":");
-			Xref endRef = new Xref(end[1],DataSource.getBySystemCode(end[0]));
-			
-			Connection con= new Connection(startRef,endRef,"Normal");
+			Connection con = TxtReader.readConnection(geneList[i],this);
 			cons.add(con);
 		}
 		return cons;
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand()); 
+	public void actionPerformed(ActionEvent e) { 
 		if(e.getActionCommand()==byTableString){
         	 inputText.setEnabled(true);
         	 btnBrowseFile.setEnabled(false);

@@ -14,6 +14,7 @@ import org.pathvisio.core.model.PropertyManager;
 import org.pathvisio.core.preferences.GlobalPreference;
 import org.pathvisio.core.preferences.Preference;
 
+import org.bridgedb.DataSource;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.pathvisio.desktop.PvDesktop;
@@ -25,6 +26,7 @@ public class PbPlugin implements Plugin, BundleActivator {
 	private static String PLUGIN_NAME = "PathBuilder";
 	
 	private selectAction action;
+	private JFrame frame;
 	private PvDesktop desktop;
 	private JMenu subMenu;
 	private static BundleContext context;
@@ -37,7 +39,6 @@ public class PbPlugin implements Plugin, BundleActivator {
 		subMenu.setText(PLUGIN_NAME);
 		subMenu.add(action);
 		desktop.registerSubMenu("Plugins", subMenu);
-		System.out.println(desktop.getSideBarTabbedPane().getWidth());
 	}
 	
 	private class selectAction extends AbstractAction {
@@ -49,13 +50,14 @@ public class PbPlugin implements Plugin, BundleActivator {
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
 		{
-			JFrame frame = new JFrame("Build pathway");
+			frame = new JFrame("Build pathway");
 			
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			frame.getContentPane().add(new InputWindow(desktop), BorderLayout.CENTER);
+			frame.getContentPane().add(new InputWindow(desktop,frame), BorderLayout.CENTER);
 			frame.pack();
 			frame.setLocationRelativeTo(desktop.getFrame());
 			frame.setVisible(true);
+			
 		}
 		
 	}
