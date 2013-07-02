@@ -102,7 +102,17 @@ public class Constructor {
 		int i = 0;
 		for (Node node: nodes){
 			try {
-				PathwayElement pel = createNode(new Xref(node.getId(),DataSource.getBySystemCode(node.getSysCode())));
+				Xref ref;
+				if (node.getId().equals("NULL")){
+					ref = new Xref(null,null);
+				}
+				else if (node.getSysCode().equals("NULL")){
+					ref = new Xref(node.getId(),null);
+				}
+				else {
+					ref = new Xref(node.getId(),DataSource.getBySystemCode(node.getSysCode()));
+				}
+				PathwayElement pel = createNode(ref);
 				pel.setTextLabel(node.getName());
 				drawNode(i,0,pel);
 				pwy.add(pel);
@@ -169,13 +179,17 @@ public class Constructor {
 		PathwayElement pel;
 		pel = PathwayElement.createPathwayElement(ObjectType.DATANODE);
 		pel.setGraphId(pwy.getUniqueGroupId());
-		pel.setDataNodeType(ref.getDataSource().getType());
-		
-		if (ref.getDataSource().isMetabolite()){
-			pel.setColor(Color.BLUE);
+		if (!ref.equals(new Xref(null,null))){
+			pel.setElementID(ref.getId());
 		}
-		pel.setElementID(ref.getId());
-		pel.setDataSource(ref.getDataSource());
+		else if (!ref.equals(new Xref(ref.getId(),null))){
+			pel.setDataNodeType(ref.getDataSource().getType());
+			if (ref.getDataSource().isMetabolite()){
+				pel.setColor(Color.BLUE);
+			}
+			pel.setDataSource(ref.getDataSource());
+		}
+		
 		return pel;
 	}
 }
