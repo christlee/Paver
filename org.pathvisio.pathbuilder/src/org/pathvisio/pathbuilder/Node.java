@@ -9,24 +9,17 @@ import org.bridgedb.Xref;
  *
  */
 
-public class Node {
-	String sysCode;
-	String id;
-	String name;
+public class Node implements Comparable<Node>{
+	private final String sysCode;
+	private final String id;
+	private final String name;
+	private final String rep;
 	
-	Node(){
-		sysCode = "";
-		id = "";
-		name = "";
-	}
-	public void setName(String name){
+	Node(String name, String id, String sysCode){
 		this.name = name;
-	}
-	public void setId(String id){
 		this.id = id;
-	}
-	public void setSysCode(String sysCode){
 		this.sysCode = sysCode;
+		rep = name + id + sysCode;
 	}
 	public String getId(){
 		return id;
@@ -36,5 +29,23 @@ public class Node {
 	}
 	public String getName(){
 		return name;
+	}
+	public int hashCode() 
+	{
+		return rep.hashCode();
+	}
+	@Override
+	public boolean equals(Object o){
+		if (o instanceof Node){
+			Node n = (Node) o;
+			return rep.equals(n.rep);
+		}
+		else{
+		return false;
+		}
+	}
+	@Override
+	public int compareTo(Node n) {
+		return rep.compareTo(n.rep);
 	}
 }

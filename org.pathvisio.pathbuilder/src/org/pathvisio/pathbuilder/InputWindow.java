@@ -55,7 +55,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JButton btnBuild;
 	private JTextArea inputText;
 	private JRadioButton byFileButton;
-	private JRadioButton byTableButton;
+	private JRadioButton manualButton;
 	private JRadioButton conButton;
 	private JRadioButton nodesButton;
 	private SwingEngine swingEngine;
@@ -63,10 +63,9 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JLabel connectionNames;
 	private JFrame frame;
 	private int side;
-
 	
-	static String byFileString = "By File";
-    static String byTableString = "By Table";
+	static String byFileString = "From File";
+    static String manualString = "Manually";
     static String conString = "Connections";
     static String nodesString = "Nodes";
     
@@ -121,10 +120,10 @@ public class InputWindow extends JPanel implements ActionListener{
         byFileButton.setActionCommand(byFileString);
         byFileButton.addActionListener(this);
         
-        byTableButton = new JRadioButton(byTableString);
-//        byTableButton.setMnemonic(KeyEvent.VK_C);
-        byTableButton.setActionCommand(byTableString);
-        byTableButton.addActionListener(this);
+        manualButton = new JRadioButton(manualString);
+//        manualButton.setMnemonic(KeyEvent.VK_C);
+        manualButton.setActionCommand(manualString);
+        manualButton.addActionListener(this);
         
         conButton = new JRadioButton(conString);
  //       conButton.setMnemonic(KeyEvent.VK_C);
@@ -138,7 +137,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		
         ButtonGroup sourceGroup = new ButtonGroup();
         sourceGroup.add(byFileButton);
-        sourceGroup.add(byTableButton);
+        sourceGroup.add(manualButton);
 
         
         ButtonGroup typeGroup = new ButtonGroup();
@@ -148,7 +147,7 @@ public class InputWindow extends JPanel implements ActionListener{
         
         Box sourceBox = Box.createVerticalBox();
         sourceBox.add(byFileButton);
-        sourceBox.add(byTableButton);
+        sourceBox.add(manualButton);
         
         Box typeBox = Box.createVerticalBox();
         typeBox.add(conButton);
@@ -184,7 +183,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		inputText = new JTextArea(7,10);
 	    JScrollPane scrollingArea = new JScrollPane(inputText);
 	    
-	    inputPanel.setBorder (BorderFactory.createTitledBorder(etch, "input table"));
+	    inputPanel.setBorder (BorderFactory.createTitledBorder(etch, "Manual input"));
 	    inputPanel.setLayout(inputLayout);
 	    
 	    inputPanel.add(nodeNames,cc.xy(2, 2));
@@ -307,7 +306,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) { 
-		if(e.getActionCommand()==byTableString){
+		if(e.getActionCommand()==manualString){
         	 inputText.setEnabled(true);
         	 btnBrowseFile.setEnabled(false);
         	 txtFile.setEnabled(false);

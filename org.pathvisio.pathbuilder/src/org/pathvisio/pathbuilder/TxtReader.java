@@ -65,8 +65,6 @@ public class TxtReader
 		List<Node> nodes = new ArrayList<Node>();
 		// line string
 		String line; 
-		// the array to return
-		String[] currentRow;
 							
 		try 
 		{
@@ -101,11 +99,13 @@ public class TxtReader
 			return null;
 		}
 		String[] start = currentRow[0].split(NAME_SEP);
-	   	Xref startRef = new Xref(start[1], DataSource.getBySystemCode(start[0]));
+		String startname = start[0] + ":" + start[1];
+		Node startRef = new Node(startname,start[1], start[0]);
 	   	String arrow = "normal";
 		  	
 	   	String[] stop = currentRow[2].split(NAME_SEP);
-	   	Xref stopRef = new Xref(stop[1], DataSource.getBySystemCode(stop[0]));
+	   	String stopname = stop[0] + ":" + stop[1];
+	   	Node stopRef = new Node(stopname, stop[1], stop[0]);
 	   	Connection con = new Connection(startRef, stopRef, arrow);
 		
 		return con;
@@ -113,37 +113,59 @@ public class TxtReader
 	
 	public static Node readSingleNode(String line,InputWindow window){
 		String[] att = line.split("\t");
-		Node node = new Node();
 		if (att.length==3){
-			node.setName(att[0]);
-			node.setId(att[1]);
-			node.setSysCode(att[2]);
+			//it could be a system code
+			String sysCode = att[2];
+			DataSource s = DataSource.getByFullName(att[2]);
+			try {
+				//but first try if it's a full name
+				//NullPointer if it's indeed empty
+				s.getSystemCode().isEmpty();
+				sysCode = s.getSystemCode();
+			}
+			catch (NullPointerException e){
+			}
+			return new Node(att[0],att[1],sysCode);
 		}
 		else if (att.length==2){
-			node.setName(att[0]);
-			node.setId(att[1]);
+			String name = att[0];
+			String sysCode;
+			String id = att[1];
 			if (!DataSourcePatterns.getDataSourceMatches(att[1]).isEmpty()){
-				node.setSysCode(DataSourcePatterns.getDataSourceMatches(att[1]).toArray()[0].toString());
+				int l = DataSourcePatterns.getDataSourceMatches(id).toArray().length;
+				DataSource[] sources = new DataSource[l];
+				DataSourcePatterns.getDataSourceMatches(id).toArray(sources);
+				sysCode = sources[0].getSystemCode();
+				
 			}
+			else {
+				sysCode = "NULL";
+			}
+			return new Node(name,id,sysCode);
 		}
 		else if (att.length==1){
-			node.setName(att[0]);
+			String name = att[0];
+			String id;
+			String sysCode;
 			//if the name is a identifier, use this identifier
-			if (!DataSourcePatterns.getDataSourceMatches(att[0]).isEmpty()){
-				node.setId(att[0]);
-				node.setSysCode(DataSourcePatterns.getDataSourceMatches(att[1]).toArray()[0].toString());
+			if (!DataSourcePatterns.getDataSourceMatches(name).isEmpty()){
+				id = name;
+				int l = DataSourcePatterns.getDataSourceMatches(id).toArray().length;
+				DataSource[] sources = new DataSource[l];
+				DataSourcePatterns.getDataSourceMatches(id).toArray(sources);
+				sysCode=sources[0].getSystemCode();
 			}
 			//else put in "NULL"
 			else {
-				node.setId("NULL");
-				node.setSysCode("NULL");
+				id = "NULL";
+				sysCode = "NULL";
 			}
+			return new Node(name,id,sysCode);
 		}
 		else {
 			window.showMessageDialog("Incorrect input!");
 			return null;
 		}
-		return node;
 	}
 }
 

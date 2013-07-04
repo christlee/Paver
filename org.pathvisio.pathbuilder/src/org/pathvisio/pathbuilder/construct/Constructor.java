@@ -1,6 +1,7 @@
 package org.pathvisio.pathbuilder.construct;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,10 +24,10 @@ import org.pathvisio.pathbuilder.Node;
 
 //TODO: This package should take care of putting the nodes and edges on the screen in a structurized manner
 public class Constructor {
-	Map<String,Xref> nodes;
+	Map<String,Node> nodes;
 	IDMapperStack db;
 	Pathway pwy;
-	Map<Xref,PathwayElement> pels;
+	Map<Node,PathwayElement> pels;
 	Set<PathwayElement> lines;
 	double centerX;
 	
@@ -35,6 +36,9 @@ public class Constructor {
 	private static int Y = 50;
 	private static int PLUSX = 120;
 	private static int PLUSY = 50;
+	private static int CSIZE = 12;
+	private static String GENE = "gene";
+	private static String METABOLITE = "metabolite";
 	
 	
 	public Constructor(Pathway pwy, IDMapperStack db){
@@ -44,23 +48,63 @@ public class Constructor {
 	}
 	
 	public void plotConnections(List<Connection> connections){
-		nodes = new HashMap<String,Xref>();
-		int i = 0;
-		int j = 0;
-		pels = new HashMap<Xref,PathwayElement>();
+		nodes = new HashMap<String,Node>();
+		pels = new HashMap<Node,PathwayElement>();
 		lines = new HashSet<PathwayElement>();
+		float j = 1;
+		int index = 0;
+		float x = (float)connections.size()/(float)CSIZE;
+		System.out.println(x);
+		System.out.println(Math.ceil(x));
+		System.out.println(Math.round(x));
+		int cols = (int)Math.ceil(x);
+		
+		j = j - cols;
+		
+		if (j<-2.9f){
+			j = -2.9f;
+		}
+		//first complete columns of 12
+		for (int k = 1;k<cols;k++){
+			List<Connection> col = new ArrayList<Connection>();
+			for (int l = 0; l<CSIZE;l++){
+				col.add(connections.get(index));
+				index++;
+			}
+			double startj = j-0.5;
+			double endj = j+0.5;
+			plotConColumn(col,startj,endj);
+			j = j+2;
+		}
+		//then the last column, this one might be incomplete
+		List<Connection> lastCol = new ArrayList<Connection>();
+		int m = cols-1;
+		for (int n = m*CSIZE ;n<connections.size();n++){
+			lastCol.add(connections.get(index));
+			index++;
+		}
+		double startj = j-0.5;
+		double endj = j+0.5;
+		plotConColumn(lastCol,startj,endj);
+		
+		for (Entry<Node,PathwayElement> entry : pels.entrySet()){
+			pwy.add(entry.getValue());
+		}
+		for (PathwayElement line : lines){
+			pwy.add(line);
+		}
+	}
+	
+	public void plotConColumn(List<Connection> connections,double startj, double endj){
+		int i = 0;
 		for (Connection connection : connections){
-			
-			Xref start = connection.getStart();
+			Node start = connection.getStart();
 			if (!nodes.containsValue(start)){
-				j = 0;
-				String sp = i + ":" + j;
+				String sp = i + ":" + startj;
 				nodes.put(sp, start);
 				try {
 					PathwayElement pel = createNode(start);
-					String label = start.getDataSource().getSystemCode() + ":" + start.getId();
-					pel.setTextLabel(label);
-					drawNode(i, 0, pel);
+					drawNode(i, startj, pel);
 					pels.put(start,pel);
 				} catch (IDMapperException e) {
 					// TODO Auto-generated catch block
@@ -68,16 +112,13 @@ public class Constructor {
 				}
 			}
 			
-			Xref end = connection.getEnd();
+			Node end = connection.getEnd();
 			if (!nodes.containsValue(end)){
-				j = 1;
-				String sp = i + ":" + j;
+				String sp = i + ":" + endj;
 				nodes.put(sp, end);
 				try {
 					PathwayElement pel = createNode(end);
-					drawNode(i, j, pel);
-					String label = end.getDataSource().getSystemCode() + ":" + end.getId();
-					pel.setTextLabel(label);
+					drawNode(i, endj, pel);
 					pels.put(end,pel);
 				} catch (IDMapperException e) {
 					// TODO Auto-generated catch block
@@ -90,31 +131,46 @@ public class Constructor {
 			lines.add(line);
 			i++;
 		}
-		for (Entry<Xref,PathwayElement> entry : pels.entrySet()){
-			pwy.add(entry.getValue());
-		}
-		for (PathwayElement line : lines){
-			pwy.add(line);
-		}
 	}
 	
 	public void plotNodes(List<Node> nodes){
+		float j = 0;
+		int index = 0;
+		float x = (float)nodes.size()/(float)CSIZE;
+		
+		int cols = (int)Math.ceil(x);
+		j = j - cols/2;
+		if (j<-3){
+			j = -3;
+		}
+		//first complete columns of 12
+		for (int k = 1;k<cols;k++){
+			List<Node> col = new ArrayList<Node>();
+			for (int l = 0; l<CSIZE;l++){
+				col.add(nodes.get(index));
+				index++;
+			}
+			plotNodeColumn(col,j);
+			j++;
+		}
+		//then the last column
+		List<Node> lastCol = new ArrayList<Node>();
+		int m = cols-1;
+		for (int n = m*CSIZE ;n<nodes.size();n++){
+			lastCol.add(nodes.get(index));
+			index++;
+		}
+		plotNodeColumn(lastCol,j);
+		
+	}
+	
+	public void plotNodeColumn(List<Node> nodes,float j){
 		int i = 0;
 		for (Node node: nodes){
 			try {
-				Xref ref;
-				if (node.getId().equals("NULL")){
-					ref = new Xref(null,null);
-				}
-				else if (node.getSysCode().equals("NULL")){
-					ref = new Xref(node.getId(),null);
-				}
-				else {
-					ref = new Xref(node.getId(),DataSource.getBySystemCode(node.getSysCode()));
-				}
-				PathwayElement pel = createNode(ref);
+				PathwayElement pel = createNode(node);
 				pel.setTextLabel(node.getName());
-				drawNode(i,0,pel);
+				drawNode(i,j,pel);
 				pwy.add(pel);
 				i++;
 			} catch (IDMapperException e) {
@@ -125,8 +181,8 @@ public class Constructor {
 		}
 	}
 	
-	void drawNode(int i, int j, PathwayElement pel){
-		double start = centerX - .5 * PLUSX;
+	void drawNode(int i, double j, PathwayElement pel){
+		double start = centerX;
 		double x = start + PLUSX * j;
 		
 		int y = Y + PLUSY * i;
@@ -175,19 +231,32 @@ public class Constructor {
 		centerX = .5 * width;
 	}
 	
-	PathwayElement createNode(Xref ref) throws IDMapperException{
+	PathwayElement createNode(Node node) throws IDMapperException{
 		PathwayElement pel;
 		pel = PathwayElement.createPathwayElement(ObjectType.DATANODE);
 		pel.setGraphId(pwy.getUniqueGroupId());
-		if (!ref.equals(new Xref(null,null))){
-			pel.setElementID(ref.getId());
+		pel.setTextLabel(node.getName());
+		if (!node.getId().equals("NULL")){
+			pel.setElementID(node.getId());
 		}
-		else if (!ref.equals(new Xref(ref.getId(),null))){
-			pel.setDataNodeType(ref.getDataSource().getType());
-			if (ref.getDataSource().isMetabolite()){
+		if (!node.getSysCode().equals("NULL")){
+			DataSource source = DataSource.getBySystemCode(node.getSysCode());
+//			if (source.getType().equals(GENE)){
+//				pel.setDataNodeType("GeneProduct");
+//			}
+//			else if (source.getType().equals(METABOLITE)){
+//				pel.setDataNodeType("Metabolite");
+//			}
+//			pel.setDataNodeType(source.getType());
+			
+			if (source.isMetabolite()){
 				pel.setColor(Color.BLUE);
+				pel.setDataNodeType(DataNodeType.METABOLITE);
 			}
-			pel.setDataSource(ref.getDataSource());
+			else{
+				pel.setDataNodeType(DataNodeType.GENEPRODUCT);
+			}
+			pel.setDataSource(source);
 		}
 		
 		return pel;
