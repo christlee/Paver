@@ -3,24 +3,22 @@ package org.pathvisio.pathbuilder;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bridgedb.Xref;
-
 public class Connection {
-	private Xref start;
-	private Xref end;
+	private Node start;
+	private Node end;
 	private String arrowtype;
 	
-	Connection(Xref start, Xref end, String arrowtype){
+	Connection(Node start, Node end, String arrowtype){
 		this.start = start;
 		this.end = end;
 		this.arrowtype = arrowtype;
 	}
 	
-	public Xref getStart(){
+	public Node getStart(){
 		return start;
 	}
 	
-	public Xref getEnd(){
+	public Node getEnd(){
 		return end;
 	}
 	
@@ -28,8 +26,8 @@ public class Connection {
 		return arrowtype;
 	}
 	
-	public Set<Xref> getNodes(){
-		Set<Xref> nodes = new HashSet<Xref>();
+	public Set<Node> getNodes(){
+		Set<Node> nodes = new HashSet<Node>();
 		nodes.add(start);
 		nodes.add(end);
 		return nodes;
