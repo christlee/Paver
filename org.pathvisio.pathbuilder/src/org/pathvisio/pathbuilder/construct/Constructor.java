@@ -41,6 +41,7 @@ public class Constructor {
 	private static String METABOLITE = "metabolite";
 	
 	
+	
 	public Constructor(Pathway pwy, IDMapperStack db){
 		this.db = db;
 		this.pwy = pwy;
@@ -54,9 +55,6 @@ public class Constructor {
 		float j = 1;
 		int index = 0;
 		float x = (float)connections.size()/(float)CSIZE;
-		System.out.println(x);
-		System.out.println(Math.ceil(x));
-		System.out.println(Math.round(x));
 		int cols = (int)Math.ceil(x);
 		
 		j = j - cols;
@@ -126,7 +124,7 @@ public class Constructor {
 				}
 				
 			}
-			PathwayElement line = drawLine(pels.get(start),pels.get(end),"start","end");
+			PathwayElement line = drawLine(pels.get(start),pels.get(end),connection.getLineType());
 			
 			lines.add(line);
 			i++;
@@ -192,7 +190,7 @@ public class Constructor {
 		pel.setMWidth(WEIGHT);
 	}
 	
-	PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, String starttype, String endtype){
+	PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, LineType ltype){
 		PathwayElement line = PathwayElement.createPathwayElement(ObjectType.LINE);
 		line.setGraphId(pwy.getUniqueGraphId());
 		
@@ -221,9 +219,14 @@ public class Constructor {
 		line.getMEnd().linkTo(endnode);
 		
 		MIMShapes.registerShapes();
+		if (isBothWays(ltype)){
+			line.setStartLineType(ltype);
+		}
+		else{
+			line.setStartLineType(LineType.LINE);
+		}
 		
-		line.setStartLineType(LineType.LINE);
-		line.setEndLineType(LineType.ARROW);
+		line.setEndLineType(ltype);
 		return line;
 	}
 	
@@ -260,5 +263,13 @@ public class Constructor {
 		}
 		
 		return pel;
+	}
+	public static boolean isBothWays(LineType lt){
+		if (lt.equals(MIMShapes.MIM_BINDING)||
+			lt.equals(MIMShapes.MIM_COVALENT_BOND)||
+			lt.equals(MIMShapes.MIM_GAP)){
+			return true;
+		}
+		else return false;
 	}
 }

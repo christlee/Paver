@@ -3,6 +3,9 @@ package org.pathvisio.pathbuilder;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -10,10 +13,14 @@ import javax.swing.JMenu;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.preferences.Preference;
+import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.pathbuilder.layout.ISOM;
+
+import sun.reflect.FieldInfo;
 
 public class PbPlugin implements Plugin, BundleActivator {
 
@@ -21,7 +28,7 @@ public class PbPlugin implements Plugin, BundleActivator {
 	private static String BUILD = "Build Pathway";
 	private static String LAYOUT = "Layout";
 	
-	
+	protected List<LineType> lineTypes;
 	private selectAction build;
 	private selectAction layout;
 	private JFrame frame;
@@ -44,8 +51,10 @@ public class PbPlugin implements Plugin, BundleActivator {
 		subMenu.setText(PLUGIN_NAME);
 		subMenu.add(build);
 		subMenu.add(layout);
+				
 		desktop.registerSubMenu("Plugins", subMenu);
 	}
+
 	
 	private class selectAction extends AbstractAction {
 
@@ -81,17 +90,12 @@ public class PbPlugin implements Plugin, BundleActivator {
 				new ISOM(desktop.getSwingEngine());
 				break;
 			}
-			
-			
 		}
-		
 	}
 	
 	public static enum PbPreference implements Preference
 	{
 		PB_PLUGIN_TXT_FILE(System.getProperty("user.home") + File.separator + "text_file.txt");
-		
-		
 
 		private final String defaultVal;
 		

@@ -27,6 +27,8 @@ public class ISOM extends LayoutAbstract{
 		}
 		
 		drawNodes((AbstractLayout<String,String>) l);
+		//remove overlap;
+		removeOverlap.remove(pwy);
 		//re-draw the lines
 		drawLines();
 	}
