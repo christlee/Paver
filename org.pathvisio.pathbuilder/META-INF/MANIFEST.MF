@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pathbuilder
 Bundle-SymbolicName: org.pathvisio.pathbuilder
-Bundle-Version: 0.3.0
+Bundle-Version: 0.3.1
 Bundle-ClassPath: lib/,
  lib/jung-algorithms-2.0.1.jar,
  lib/jung-graph-impl-2.0.1.jar,

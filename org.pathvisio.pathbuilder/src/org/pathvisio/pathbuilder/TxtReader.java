@@ -11,6 +11,7 @@ import java.util.Set;
 import org.bridgedb.DataSource;
 import org.bridgedb.DataSourcePatterns;
 import org.bridgedb.Xref;
+import org.pathvisio.core.model.LineType;
 
 /**
 * TODO: description
@@ -92,6 +93,7 @@ public class TxtReader
 	public static Connection readConnection(String line, InputWindow window){
 		// the array to return
 		String[] currentRow;
+		List<LineType> lineTypes = window.getLineTypes();
 
 		currentRow=line.split(ITEM_SEP);
 		if (currentRow.length!=3){
@@ -101,12 +103,17 @@ public class TxtReader
 		String[] start = currentRow[0].split(NAME_SEP);
 		String startname = start[0] + ":" + start[1];
 		Node startRef = new Node(startname,start[1], start[0]);
-	   	String arrow = "normal";
-		  	
+	   	String ltstring = currentRow[1];
+	   	LineType ltype = LineType.ARROW;
+	   	for (LineType lt: lineTypes){
+	   		if (lt.getName().equals(ltstring)){
+	   			ltype = lt;
+	   		}
+	   	}
 	   	String[] stop = currentRow[2].split(NAME_SEP);
 	   	String stopname = stop[0] + ":" + stop[1];
 	   	Node stopRef = new Node(stopname, stop[1], stop[0]);
-	   	Connection con = new Connection(startRef, stopRef, arrow);
+	   	Connection con = new Connection(startRef, stopRef, ltype);
 		
 		return con;
 	}

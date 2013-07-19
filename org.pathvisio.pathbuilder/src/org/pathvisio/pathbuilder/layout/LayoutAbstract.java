@@ -11,6 +11,7 @@ import org.pathvisio.gui.SwingEngine;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 
@@ -21,7 +22,7 @@ public abstract class LayoutAbstract{
 	Graph<String,String> g;
 	
 	protected void createDSMultigraph(){
-		g = new DirectedSparseMultigraph<String, String>();
+		g = new DirectedSparseGraph<String, String>();
 		List<PathwayElement> elements = pwy.getDataObjects();
 		for (PathwayElement element : elements){
 			//first make sure each element has a unique graphId

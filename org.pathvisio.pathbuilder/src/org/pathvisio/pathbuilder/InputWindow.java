@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +28,10 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import org.bridgedb.IDMapperStack;
+import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.preferences.PreferenceManager;
+import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
@@ -53,6 +56,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JLabel connectionNames;
 	private JFrame frame;
 	private int side;
+	private List<LineType> lineTypes;
 	
 	static String byFileString = "From File";
     static String manualString = "Manually";
@@ -67,6 +71,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		this.swingEngine = desktop.getSwingEngine();
 		this.frame = frame;
 		side=desktop.getSideBarTabbedPane().getWidth();
+		findLineTypes();
 		
 		txtFile = new JTextField();
 		txtFile.setText(PreferenceManager.getCurrent().get(PbPreference.PB_PLUGIN_TXT_FILE));
@@ -273,6 +278,27 @@ public class InputWindow extends JPanel implements ActionListener{
 			construct.plotNodes(nodes);
 		}
 		frame.dispose();
+	}
+	
+	private void findLineTypes(){
+		lineTypes = new ArrayList<LineType>();
+		for (Field field: MIMShapes.class.getDeclaredFields()){
+			if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) &&
+				field.getGenericType().equals(LineType.class)){
+				try {
+					lineTypes.add((LineType)field.get(null));
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	protected List<LineType> getLineTypes(){
+		return lineTypes;
 	}
 	
 	private List<Node> getNodes(){

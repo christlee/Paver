@@ -2,16 +2,18 @@ package org.pathvisio.pathbuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.pathvisio.core.model.LineType;
 
 public class Connection {
 	private Node start;
 	private Node end;
-	private String arrowtype;
+	private LineType lineType;
 	
-	Connection(Node start, Node end, String arrowtype){
+		
+	Connection(Node start, Node end, LineType lineType){
 		this.start = start;
 		this.end = end;
-		this.arrowtype = arrowtype;
+		this.lineType = lineType;
 	}
 	
 	public Node getStart(){
@@ -22,8 +24,8 @@ public class Connection {
 		return end;
 	}
 	
-	public String getArrowtype(){
-		return arrowtype;
+	public LineType getLineType(){
+		return lineType;
 	}
 	
 	public Set<Node> getNodes(){
@@ -32,4 +34,6 @@ public class Connection {
 		nodes.add(end);
 		return nodes;
 	}
+	
+
 }
