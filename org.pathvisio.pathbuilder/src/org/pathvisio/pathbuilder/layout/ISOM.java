@@ -14,10 +14,11 @@ public class ISOM extends LayoutAbstract{
 	Transformer<String,Point2D> in;
 	
 	
-	public ISOM(SwingEngine swingEngine){
+	public ISOM(SwingEngine swingEngine,boolean selection){
 		super.swingEngine = swingEngine;
 		super.pwy = swingEngine.getEngine().getActivePathway();
-		
+		super.selection = selection;
+
 		createDSMultigraph();
 		l = new ISOMLayout<String,String>( g );
 		setDimension(l);
@@ -28,7 +29,7 @@ public class ISOM extends LayoutAbstract{
 		
 		drawNodes((AbstractLayout<String,String>) l);
 		//remove overlap;
-		removeOverlap.remove(pwy);
+//		removeOverlap.remove(pwy);
 		//re-draw the lines
 		drawLines();
 	}

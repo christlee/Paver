@@ -1,7 +1,5 @@
 package org.pathvisio.pathbuilder;
 
-import org.bridgedb.DataSource;
-import org.bridgedb.Xref;
 /**
  * 
  * 

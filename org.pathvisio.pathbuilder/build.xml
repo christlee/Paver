@@ -27,7 +27,7 @@
 		<fileset dir="./lib">
 			<include name = "jung-algorithms-2.0.1.jar" />
 			<include name = "jung-graph-impl-2.0.1.jar" />
-			<include name = "collections-generic-4.0.1.jar" />
+			<include name = "collections-generic-4.01.jar" />
 			<include name = "jung-api-2.0.1.jar"/>
 		</fileset>	
 	</path>
@@ -45,7 +45,7 @@
 			<fileset dir="./lib">
 				<include name = "jung-algorithms-2.0.1.jar" />
 				<include name = "jung-graph-impl-2.0.1.jar" />
-				<include name = "collections-generic-4.0.1.jar" />
+				<include name = "collections-generic-4.01.jar" />
 				<include name = "jung-api-2.0.1.jar"/>
 			</fileset>
 		</copy>

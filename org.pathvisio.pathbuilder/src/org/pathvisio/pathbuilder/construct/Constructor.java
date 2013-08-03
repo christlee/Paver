@@ -1,6 +1,7 @@
 package org.pathvisio.pathbuilder.construct;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import java.util.Set;
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.IDMapperStack;
-import org.bridgedb.Xref;
 import org.pathvisio.core.model.DataNodeType;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.ObjectType;
@@ -29,23 +29,21 @@ public class Constructor {
 	Pathway pwy;
 	Map<Node,PathwayElement> pels;
 	Set<PathwayElement> lines;
-	double centerX;
+	Point start;
+	boolean newpwy;
 	
 	private static int HEIGHT = 20;
 	private static int WEIGHT = 80;
-	private static int Y = 50;
 	private static int PLUSX = 120;
 	private static int PLUSY = 50;
 	private static int CSIZE = 12;
-	private static String GENE = "gene";
-	private static String METABOLITE = "metabolite";
 	
 	
-	
-	public Constructor(Pathway pwy, IDMapperStack db){
+	public Constructor(Pathway pwy, IDMapperStack db,boolean newpwy){
 		this.db = db;
 		this.pwy = pwy;
-		centerX = 50;
+		this.newpwy = newpwy;
+		start = new Point(50,50);
 	}
 	
 	public void plotConnections(List<Connection> connections){
@@ -57,11 +55,14 @@ public class Constructor {
 		float x = (float)connections.size()/(float)CSIZE;
 		int cols = (int)Math.ceil(x);
 		
-		j = j - cols;
+		if (newpwy){
+			j = j - .5f * cols;
 		
-		if (j<-2.9f){
-			j = -2.9f;
+			if (j<-2.9f){
+				j = -2.9f;
+			}
 		}
+		
 		//first complete columns of 12
 		for (int k = 1;k<cols;k++){
 			List<Connection> col = new ArrayList<Connection>();
@@ -137,10 +138,13 @@ public class Constructor {
 		float x = (float)nodes.size()/(float)CSIZE;
 		
 		int cols = (int)Math.ceil(x);
-		j = j - cols/2;
-		if (j<-3){
-			j = -3;
+		if (newpwy){
+			j = j - cols/2;
+			if (j<-3){
+				j = -3;
+			}
 		}
+		
 		//first complete columns of 12
 		for (int k = 1;k<cols;k++){
 			List<Node> col = new ArrayList<Node>();
@@ -180,10 +184,9 @@ public class Constructor {
 	}
 	
 	void drawNode(int i, double j, PathwayElement pel){
-		double start = centerX;
-		double x = start + PLUSX * j;
+		int x = (int)(start.x + PLUSX * j);
 		
-		int y = Y + PLUSY * i;
+		int y = start.y + PLUSY * i;
 		pel.setMCenterX(x);
 		pel.setMCenterY(y);
 		pel.setMHeight(HEIGHT);
@@ -230,8 +233,9 @@ public class Constructor {
 		return line;
 	}
 	
-	public void setWidth(int width){
-		centerX = .5 * width;
+	
+	public void setStartX(int x){
+		start.setLocation(x,start.y);
 	}
 	
 	PathwayElement createNode(Node node) throws IDMapperException{
