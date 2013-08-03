@@ -3,8 +3,6 @@ package org.pathvisio.pathbuilder;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -15,31 +13,35 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.preferences.Preference;
-import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.pathbuilder.layout.ISOM;
 
-import sun.reflect.FieldInfo;
-
 public class PbPlugin implements Plugin, BundleActivator {
 
 	private static String PLUGIN_NAME = "PathBuilder";
-	private static String BUILD = "Build Pathway";
-	private static String LAYOUT = "Layout";
+	private static String BUILD = "Build new Pathway";
+	private static String ADD = "Add to Pathway";
+	private static String LAYOUT = "Layout All";
+	private static String LAYSEL = "Layout Selection";
 	
 	protected List<LineType> lineTypes;
 	private selectAction build;
 	private selectAction layout;
+	private selectAction add;
 	private JFrame frame;
 	private PvDesktop desktop;
 	private JMenu subMenu;
+	private selectAction laysel;
 	private static BundleContext context;
 
 	public static enum Action
 	{
 		BUILD,
-		LAYOUT;
+		ADD,
+		LAYOUT,
+		LAYSEL;
+		
 	}
 	
 	@Override
@@ -47,11 +49,16 @@ public class PbPlugin implements Plugin, BundleActivator {
 		this.desktop = desktop;
 		build = new selectAction(Action.BUILD);
 		layout = new selectAction(Action.LAYOUT);
+		add = new selectAction(Action.ADD);
+		laysel = new selectAction(Action.LAYSEL);
 		subMenu = new JMenu();
 		subMenu.setText(PLUGIN_NAME);
 		subMenu.add(build);
+		subMenu.add(add);
 		subMenu.add(layout);
-				
+		subMenu.add(laysel);
+		
+	
 		desktop.registerSubMenu("Plugins", subMenu);
 	}
 
@@ -70,6 +77,12 @@ public class PbPlugin implements Plugin, BundleActivator {
 			case LAYOUT:
 				putValue(NAME,LAYOUT);
 				break;
+			case ADD:
+				putValue(NAME,ADD);
+				break;
+			case LAYSEL:
+				putValue(NAME,LAYSEL);
+				break;
 			}
 		}
 		@Override
@@ -81,13 +94,24 @@ public class PbPlugin implements Plugin, BundleActivator {
 				frame = new JFrame("Build pathway");
 			
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.getContentPane().add(new InputWindow(desktop,frame), BorderLayout.CENTER);
+				frame.getContentPane().add(new InputWindow(desktop,frame,true), BorderLayout.CENTER);
 				frame.pack();
 				frame.setLocationRelativeTo(desktop.getFrame());
 				frame.setVisible(true);
 				break;
 			case LAYOUT:
-				new ISOM(desktop.getSwingEngine());
+				new ISOM(desktop.getSwingEngine(),false);
+				break;
+			case ADD:
+				frame = new JFrame("Add to existing pathway");
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				frame.getContentPane().add(new InputWindow(desktop,frame,false), BorderLayout.CENTER);
+				frame.pack();
+				frame.setLocationRelativeTo(desktop.getFrame());
+				frame.setVisible(true);
+				break;
+			case LAYSEL:
+				new ISOM(desktop.getSwingEngine(),true);
 				break;
 			}
 		}

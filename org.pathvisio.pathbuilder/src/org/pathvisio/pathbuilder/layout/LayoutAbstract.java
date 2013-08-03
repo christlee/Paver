@@ -1,18 +1,20 @@
 package org.pathvisio.pathbuilder.layout;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.pathvisio.core.model.ObjectType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
+import org.pathvisio.core.view.Graphics;
 import org.pathvisio.gui.SwingEngine;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 
 public abstract class LayoutAbstract{
@@ -20,10 +22,37 @@ public abstract class LayoutAbstract{
 	Pathway pwy;
 	SwingEngine swingEngine;
 	Graph<String,String> g;
+	boolean selection;
+	Point start;
 	
 	protected void createDSMultigraph(){
 		g = new DirectedSparseGraph<String, String>();
-		List<PathwayElement> elements = pwy.getDataObjects();
+		List<PathwayElement> elements;
+		start = new Point(0,0);
+		if (selection){
+			List<Graphics> graphics = swingEngine.getEngine().getActiveVPathway().getSelectedGraphics();
+			elements = new ArrayList<PathwayElement>();
+			start.x=(int)graphics.get(1).getVBounds().getMinX();
+			start.y=(int)graphics.get(1).getVBounds().getMinY();
+			for (Graphics graphic : graphics){
+				PathwayElement element = graphic.getPathwayElement();
+				elements.add(element); 
+				double minX = element.getMCenterX();
+				double minY = element.getMCenterY();
+			
+				if (start.x>minX){
+					start.x = (int)minX;
+				}
+				if (start.y>minY){
+					start.y = (int)minY;
+				}
+			}
+			
+		}
+		else{
+			elements = pwy.getDataObjects();
+		}
+		
 		for (PathwayElement element : elements){
 			//first make sure each element has a unique graphId
 			try {
@@ -49,8 +78,8 @@ public abstract class LayoutAbstract{
 	protected void drawNodes(AbstractLayout<String,String> l){
 		for (String v : l.getGraph().getVertices()){
 			Point2D point = l.transform(v);
-			double x = point.getX();
-			double y = point.getY();
+			double x = point.getX()+start.x;
+			double y = point.getY()+start.y;
 			PathwayElement e = pwy.getElementById(v);
 			x = x + e.getMWidth()/2;
 			y = y + e.getMHeight()/2;

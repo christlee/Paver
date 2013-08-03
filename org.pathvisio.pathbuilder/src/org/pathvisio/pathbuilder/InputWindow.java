@@ -9,6 +9,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -23,10 +24,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperStack;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.Pathway;
@@ -46,7 +47,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JButton btnBrowseFile;
 	private JTextField txtFile;
 	private JButton btnBuild;
-	private JTextArea inputText;
+	private JSuggestArea inputText;
 	private JRadioButton byFileButton;
 	private JRadioButton manualButton;
 	private JRadioButton conButton;
@@ -57,6 +58,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JFrame frame;
 	private int side;
 	private List<LineType> lineTypes;
+	private boolean newpwy;
 	
 	static String byFileString = "From File";
     static String manualString = "Manually";
@@ -67,9 +69,10 @@ public class InputWindow extends JPanel implements ActionListener{
 	 * The input window.<p>
 	 * Class creates a frame with the elements to enable user input.
 	 */
-	InputWindow(PvDesktop desktop,JFrame frame){
+	InputWindow(PvDesktop desktop,JFrame frame,boolean newpwy){
 		this.swingEngine = desktop.getSwingEngine();
 		this.frame = frame;
+		this.newpwy = newpwy;
 		side=desktop.getSideBarTabbedPane().getWidth();
 		findLineTypes();
 		
@@ -175,7 +178,14 @@ public class InputWindow extends JPanel implements ActionListener{
 	    		"(label [tab] ID [tab] DataSource)                      </html>");
 		connectionNames = new JLabel("<html> Enter connections here <br> " +
 	    		"(SystemCode[:]ID [tab] LineType [tab] SystemCode[:]ID) </html>");
-		inputText = new JTextArea(7,10);
+		
+		inputText = new JSuggestArea(7,10,frame);
+		
+		if (conButton.isSelected()){
+			
+		}
+		
+		
 	    JScrollPane scrollingArea = new JScrollPane(inputText);
 	    
 	    inputPanel.setBorder (BorderFactory.createTitledBorder(etch, "Manual input"));
@@ -268,9 +278,18 @@ public class InputWindow extends JPanel implements ActionListener{
 			nodes = getNodes();
 		}
 		IDMapperStack db = swingEngine.getGdbManager().getCurrentGdb();
+		int startX;
+		if (newpwy){
+			swingEngine.newPathway();
+			startX = (int)(.5* swingEngine.getFrame().getWidth()-side);
+		}
+		else {
+			startX = swingEngine.getEngine().getActiveVPathway().getVWidth();
+		}
 		Pathway pwy = swingEngine.getEngine().getActivePathway();
-		Constructor construct = new Constructor(pwy, db);
-		construct.setWidth(swingEngine.getFrame().getWidth()-side);
+		Constructor construct = new Constructor(pwy, db,newpwy);
+		construct.setStartX(startX);
+		
 		if (conButton.isSelected()){
 			construct.plotConnections(cons);
 		}
@@ -323,25 +342,54 @@ public class InputWindow extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) { 
 		if(e.getActionCommand()==manualString){
-        	 inputText.setEnabled(true);
-        	 btnBrowseFile.setEnabled(false);
-        	 txtFile.setEnabled(false);
-        	 
-         } else if (e.getActionCommand()==byFileString){
+        	inputText.setEnabled(true);
+        	btnBrowseFile.setEnabled(false);
+        	txtFile.setEnabled(false);
+        
+        } else if (e.getActionCommand()==byFileString){
         	 inputText.setEnabled(false);
         	 btnBrowseFile.setEnabled(true);
         	 txtFile.setEnabled(true);
         	 
-         } else if (e.getActionCommand()==conString){
-        	 nodeNames.setVisible(false);
-        	 connectionNames.setVisible(true);
+        } else if (e.getActionCommand()==conString){	
+        	nodeNames.setVisible(false);
+        	connectionNames.setVisible(true);
+        	inputText.clearSuggestions();
+        	
+        	Vector<String> linetypes = new Vector<String>();
+ 			for (LineType linetype: lineTypes){
+ 				linetypes.add(linetype.getName());
+ 			}
+ 			inputText.setSuggestSecond(linetypes, "\t");
+ 		
+ 			Vector<String> syscodes = new Vector<String>();
+ 			for (String name: DataSource.getFullNames()){
+ 				String syscode = DataSource.getByFullName(name).getSystemCode();
+ 				if (!syscode.isEmpty()){
+ 					syscodes.add(syscode);
+ 				}
+ 			}
+ 			inputText.setSuggestFirst(syscodes, ":");
+ 			inputText.setSuggestThird(syscodes, ":");
         	 
-        	 
-         } else if (e.getActionCommand()==nodesString){
-        	 connectionNames.setVisible(false);
-        	 nodeNames.setVisible(true);
-        	 txtFile.setColumns(1);
-         }
+        } else if (e.getActionCommand()==nodesString){
+        	connectionNames.setVisible(false);
+        	nodeNames.setVisible(true);
+        	txtFile.setColumns(1);
+        	
+        	inputText.clearSuggestions();
+        	Vector<String> datasources = new Vector<String>();
+        	for (String name: DataSource.getFullNames()){
+        		if (!name.isEmpty()){
+        			datasources.add(name);
+        		}
+        		String syscode = DataSource.getByFullName(name).getSystemCode();
+        		if (!syscode.isEmpty()){
+        			datasources.add(syscode);
+        		}
+        	}
+        	inputText.setSuggestThird(datasources, "\n");
+        }
     }
 	
 	public void showMessageDialog(String message) 
