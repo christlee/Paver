@@ -1,9 +1,11 @@
 package org.pathvisio.pathbuilder;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.IllegalComponentStateException;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -26,6 +28,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 
 /**
  * Provides a text-field that makes suggestions using a provided data-vector.
@@ -179,8 +182,8 @@ public class JSuggestArea extends JTextArea {
 					list.setListData(first);
 				}
 				
-				d.setVisible(true);
-				showSuggest();
+//				d.setVisible(true);
+//				showSuggest();
 			}
 		});
 		d = new JDialog(owner);
@@ -249,7 +252,9 @@ public class JSuggestArea extends JTextArea {
 					list.ensureIndexIsVisible(list.getSelectedIndex() - 1);
 					return;
 				} else if (e.getKeyCode() == KeyEvent.VK_ENTER
-						& list.getSelectedIndex() != -1 & suggestions.size() > 0) {
+						&& list.getSelectedIndex() != -1 && suggestions.size() > 0 &&
+						list.isShowing()) {
+					
 					complete();
 				}
 				showSuggest();
@@ -259,13 +264,25 @@ public class JSuggestArea extends JTextArea {
 
 	private void complete(){
 		String text = getText();
-		if (text.charAt(text.length()-1)=='\t'){
-			text = text + "new";
+		
+		String lastline = "";
+		try {
+			lastline = text.substring(getLineStartOffset(getLineCount()-1));
+			if (lastline.isEmpty()){
+				lastline = text.substring(getLineStartOffset(getLineCount()-2),getLineEndOffset(getLineCount()-2));
+			}
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		String[] lines = text.split("\n");
-		String[] words = lines[lines.length-1].split("\t");
+		System.out.println(lastline);
+		
+		String[] words = lastline.split("\t");
+		for (String word : words){
+			System.out.println(word);
+		}
 		String val;
-		if (words.length==1){
+		if (words.length==1 || words.length==0){
 			val = (String) list.getSelectedValue() + firstsuf;
 		}
 		else if (words.length==2){
@@ -274,16 +291,28 @@ public class JSuggestArea extends JTextArea {
 		else {
 			val = (String) list.getSelectedValue() + thirdsuf;
 		}
-		String[] t = text.split("\t");
-		t[t.length-1] = val;
+		String[] n = text.split("\n");
 		String txt = "";
-		for (String word : t){
+		
+		for (int i = 0; i< n.length-1;i++){
 			if (txt.isEmpty()){
-				txt = word;
+				txt = n[i];
 			}
-			else {
-				txt = txt + "\t" + word;
+			else{
+				txt = txt + "\n" + n[i];
 			}
+		}
+		String[] t = lastline.split("\t");
+		t[t.length-1] = val;
+		if(txt.isEmpty()){
+			txt = t[0];
+		}
+		else{
+			txt = txt + "\n" + t[0];
+		}
+//		txt = "";
+		for (int i = 1; i<t.length; i++){
+			txt = txt + "\t" + t[i];		
 		}
 		setText(txt);
 		matcher.stop = true;
@@ -480,7 +509,7 @@ public class JSuggestArea extends JTextArea {
 				}
 				String word;
 				if (text.charAt(text.length()-1)=='\t'){
-					word = "";
+					return;
 				}
 				else {
 					word = words[words.length-1];

@@ -301,6 +301,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	
 	private void findLineTypes(){
 		lineTypes = new ArrayList<LineType>();
+		lineTypes.add(LineType.ARROW);
 		for (Field field: MIMShapes.class.getDeclaredFields()){
 			if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) &&
 				field.getGenericType().equals(LineType.class)){
