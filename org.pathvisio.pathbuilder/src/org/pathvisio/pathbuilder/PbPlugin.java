@@ -15,7 +15,6 @@ import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.preferences.Preference;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
-import org.pathvisio.pathbuilder.connect.ConnectorManager;
 import org.pathvisio.pathlayout.LayoutManager.Layout;
 
 public class PbPlugin implements Plugin, BundleActivator {
@@ -33,7 +32,6 @@ public class PbPlugin implements Plugin, BundleActivator {
 	{
 		BUILD("Build new Pathway"),
 		ADD("Add to Pathway"),
-		CONNECT("Connect Nodes"),
 		LAYOUT("Layout All"),
 		LAYSEL("Layout Selection");
 		
@@ -90,14 +88,6 @@ public class PbPlugin implements Plugin, BundleActivator {
 			case LAYOUT:
 				layout.useSelection(false);
 				layout.doLayout(desktop.getSwingEngine());
-				break;
-			case CONNECT:
-				frame = new JFrame("Select Source");
-				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.getContentPane().add(new ConnectorManager(desktop.getSwingEngine(),frame), BorderLayout.CENTER);
-				frame.pack();
-				frame.setLocationRelativeTo(desktop.getFrame());
-				frame.setVisible(true);
 				break;
 			case ADD:
 				frame = new JFrame("Add to existing pathway");
