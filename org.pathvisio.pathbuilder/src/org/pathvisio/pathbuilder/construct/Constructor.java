@@ -14,10 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bridgedb.AttributeMapper;
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
-import org.bridgedb.IDMapperStack;
 import org.pathvisio.core.data.GdbManager;
 import org.pathvisio.core.model.ConverterException;
 import org.pathvisio.core.model.DataNodeType;
@@ -26,9 +24,6 @@ import org.pathvisio.core.model.ObjectType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
-import org.pathvisio.gui.SwingEngine;
-import org.pathvisio.pathbuilder.Connection;
-import org.pathvisio.pathbuilder.Node;
 import org.pathvisio.plugins.PathwayCommonsPppPlugin;
 import org.pathvisio.plugins.Suggestion.SuggestionException;
 

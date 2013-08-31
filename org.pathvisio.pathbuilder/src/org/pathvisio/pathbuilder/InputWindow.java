@@ -29,7 +29,6 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import org.bridgedb.DataSource;
-import org.bridgedb.IDMapperStack;
 import org.pathvisio.core.data.GdbManager;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.Pathway;
@@ -39,7 +38,9 @@ import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.pathbuilder.PbPlugin.PbPreference;
+import org.pathvisio.pathbuilder.construct.Connection;
 import org.pathvisio.pathbuilder.construct.Constructor;
+import org.pathvisio.pathbuilder.construct.Node;
 import org.pathvisio.plugins.Suggestion.SuggestionException;
 
 import com.jgoodies.forms.layout.CellConstraints;

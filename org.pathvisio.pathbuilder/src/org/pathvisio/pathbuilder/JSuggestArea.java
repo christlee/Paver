@@ -1,11 +1,9 @@
 package org.pathvisio.pathbuilder;
 
-import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.IllegalComponentStateException;
 import java.awt.Point;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;

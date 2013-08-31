@@ -9,6 +9,8 @@ import java.util.List;
 import org.bridgedb.DataSource;
 import org.bridgedb.DataSourcePatterns;
 import org.pathvisio.core.model.LineType;
+import org.pathvisio.pathbuilder.construct.Connection;
+import org.pathvisio.pathbuilder.construct.Node;
 
 /**
 * TODO: description
