@@ -9,7 +9,7 @@
 	<property name="ant.build.javac.source" value="1.5" />
 
 	<property name="base.name" value="org.pathvisio.pathbuilder" />
-	<property name="version" value="0.4.0" />
+	<property name="version" value="0.5.0" />
 	<property name="jar.name" value="${base.name}-${version}.jar" />
 	<property name="pathvisio.dir" value="../../PathVisio/" />
 
@@ -25,10 +25,7 @@
 			<include name="org.eclipse.osgi.jar" />
 		</fileset>
 		<fileset dir="./lib">
-			<include name = "jung-algorithms-2.0.1.jar" />
-			<include name = "jung-graph-impl-2.0.1.jar" />
-			<include name = "collections-generic-4.01.jar" />
-			<include name = "jung-api-2.0.1.jar"/>
+			<include name = "org.pathvisio.pathlayout-1.0.0.jar"/>
 		</fileset>	
 	</path>
 
@@ -43,10 +40,7 @@
 		</fail>
 		<copy toDir="build/lib">
 			<fileset dir="./lib">
-				<include name = "jung-algorithms-2.0.1.jar" />
-				<include name = "jung-graph-impl-2.0.1.jar" />
-				<include name = "collections-generic-4.01.jar" />
-				<include name = "jung-api-2.0.1.jar"/>
+				<include name = "org.pathvisio.pathlayout-1.0.0.jar"/>
 			</fileset>
 		</copy>
 	</target>

@@ -15,49 +15,51 @@ import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.preferences.Preference;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
-import org.pathvisio.pathbuilder.layout.ISOM;
+import org.pathvisio.pathbuilder.connect.ConnectorManager;
+import org.pathvisio.pathlayout.LayoutManager.Layout;
 
 public class PbPlugin implements Plugin, BundleActivator {
 
 	private static String PLUGIN_NAME = "PathBuilder";
-	private static String BUILD = "Build new Pathway";
-	private static String ADD = "Add to Pathway";
-	private static String LAYOUT = "Layout All";
-	private static String LAYSEL = "Layout Selection";
+	private Layout layout;
 	
 	protected List<LineType> lineTypes;
-	private selectAction build;
-	private selectAction layout;
-	private selectAction add;
 	private JFrame frame;
 	private PvDesktop desktop;
 	private JMenu subMenu;
-	private selectAction laysel;
 	private static BundleContext context;
 
 	public static enum Action
 	{
-		BUILD,
-		ADD,
-		LAYOUT,
-		LAYSEL;
+		BUILD("Build new Pathway"),
+		ADD("Add to Pathway"),
+		CONNECT("Connect Nodes"),
+		LAYOUT("Layout All"),
+		LAYSEL("Layout Selection");
 		
+		private Action(final String text) {
+	        this.text = text;
+	    }
+
+	    private final String text;
+
+	    @Override
+	    public String toString() {
+	        return text;
+	    }
 	}
 	
 	@Override
 	public void init(PvDesktop desktop) {
 		this.desktop = desktop;
-		build = new selectAction(Action.BUILD);
-		layout = new selectAction(Action.LAYOUT);
-		add = new selectAction(Action.ADD);
-		laysel = new selectAction(Action.LAYSEL);
+		
 		subMenu = new JMenu();
 		subMenu.setText(PLUGIN_NAME);
-		subMenu.add(build);
-		subMenu.add(add);
-		subMenu.add(layout);
-		subMenu.add(laysel);
+		for (Action a: Action.values()){
+			subMenu.add(new selectAction(a));
+		}
 		
+		layout = Layout.PREFUSE;
 	
 		desktop.registerSubMenu("Plugins", subMenu);
 	}
@@ -68,22 +70,8 @@ public class PbPlugin implements Plugin, BundleActivator {
 		private Action action;
 		selectAction(Action action)
 		{
+			putValue(NAME,action.text);
 			this.action = action;
-			switch(action)
-			{
-			case BUILD:
-				putValue(NAME,BUILD);
-				break;
-			case LAYOUT:
-				putValue(NAME,LAYOUT);
-				break;
-			case ADD:
-				putValue(NAME,ADD);
-				break;
-			case LAYSEL:
-				putValue(NAME,LAYSEL);
-				break;
-			}
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
@@ -100,7 +88,16 @@ public class PbPlugin implements Plugin, BundleActivator {
 				frame.setVisible(true);
 				break;
 			case LAYOUT:
-				new ISOM(desktop.getSwingEngine(),false);
+				layout.useSelection(false);
+				layout.doLayout(desktop.getSwingEngine());
+				break;
+			case CONNECT:
+				frame = new JFrame("Select Source");
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				frame.getContentPane().add(new ConnectorManager(desktop.getSwingEngine(),frame), BorderLayout.CENTER);
+				frame.pack();
+				frame.setLocationRelativeTo(desktop.getFrame());
+				frame.setVisible(true);
 				break;
 			case ADD:
 				frame = new JFrame("Add to existing pathway");
@@ -111,7 +108,8 @@ public class PbPlugin implements Plugin, BundleActivator {
 				frame.setVisible(true);
 				break;
 			case LAYSEL:
-				new ISOM(desktop.getSwingEngine(),true);
+				layout.useSelection(true);
+				layout.doLayout(desktop.getSwingEngine());
 				break;
 			}
 		}

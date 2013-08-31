@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,6 +30,7 @@ import javax.swing.border.Border;
 
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperStack;
+import org.pathvisio.core.data.GdbManager;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.preferences.PreferenceManager;
@@ -38,6 +40,7 @@ import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.pathbuilder.PbPlugin.PbPreference;
 import org.pathvisio.pathbuilder.construct.Constructor;
+import org.pathvisio.plugins.Suggestion.SuggestionException;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -52,6 +55,7 @@ public class InputWindow extends JPanel implements ActionListener{
 	private JRadioButton manualButton;
 	private JRadioButton conButton;
 	private JRadioButton nodesButton;
+	private JCheckBox findConBox;
 	private SwingEngine swingEngine;
 	private JLabel nodeNames;
 	private JLabel connectionNames;
@@ -64,6 +68,7 @@ public class InputWindow extends JPanel implements ActionListener{
     static String manualString = "Manually";
     static String conString = "Connections";
     static String nodesString = "Nodes";
+    static String FINDCON = "search for connections";
     
     /**
 	 * The input window.<p>
@@ -94,7 +99,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		
 		FormLayout panelLayout = new FormLayout(
 				"4dlu, fill:pref:grow, 4dlu",
-				"4dlu, pref, 4dlu, pref, 4dlu, fill:pref:grow, 4dlu");
+				"4dlu, pref, 4dlu, pref, 4dlu, fill:pref:grow, 4dlu, pref, 4dlu");
 		
 		CellConstraints cc = new CellConstraints();
 		Border etch = BorderFactory.createEtchedBorder();
@@ -214,11 +219,17 @@ public class InputWindow extends JPanel implements ActionListener{
         byFileButton.doClick();
         conButton.doClick();
 	    
+        Box findCon = Box.createHorizontalBox();
+        findConBox = new JCheckBox();
+        findCon.add(findConBox);
+        findCon.add(new JLabel(FINDCON));
+        
         panel.setLayout(panelLayout);
         
 	    panel.add(settingsPanel, cc.xy(2, 2));
 	    panel.add(browsePanel, cc.xy(2, 4));
 		panel.add(inputPanel, cc.xy(2, 6));
+		panel.add(findCon, cc.xy(2, 8));
 		
 		add(panel, BorderLayout.CENTER);
 	}
@@ -277,7 +288,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		else {
 			nodes = getNodes();
 		}
-		IDMapperStack db = swingEngine.getGdbManager().getCurrentGdb();
+		GdbManager db = swingEngine.getGdbManager();
 		int startX;
 		if (newpwy){
 			swingEngine.newPathway();
@@ -295,6 +306,14 @@ public class InputWindow extends JPanel implements ActionListener{
 		}
 		else {
 			construct.plotNodes(nodes);
+			if (findConBox.isSelected()){
+				try {
+					construct.findCons();
+				} catch (SuggestionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		frame.dispose();
 	}
