@@ -1,4 +1,4 @@
-package org.pathvisio.pathbuilder;
+package org.pathvisio.pathbuilder.construct;
 
 /**
  * 
@@ -13,7 +13,7 @@ public class Node implements Comparable<Node>{
 	private final String name;
 	private final String rep;
 	
-	Node(String name, String id, String sysCode){
+	public Node(String name, String id, String sysCode){
 		this.name = name;
 		this.id = id;
 		this.sysCode = sysCode;

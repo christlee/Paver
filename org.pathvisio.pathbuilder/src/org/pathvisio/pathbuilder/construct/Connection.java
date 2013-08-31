@@ -1,4 +1,4 @@
-package org.pathvisio.pathbuilder;
+package org.pathvisio.pathbuilder.construct;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +10,7 @@ public class Connection {
 	private LineType lineType;
 	
 		
-	Connection(Node start, Node end, LineType lineType){
+	public Connection(Node start, Node end, LineType lineType){
 		this.start = start;
 		this.end = end;
 		this.lineType = lineType;
