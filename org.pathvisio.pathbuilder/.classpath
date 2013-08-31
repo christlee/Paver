@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.pathvisio.pathlayout-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/PathwayLoom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prefuse.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib" sourcepath="lib"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/jung-algorithms-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/jung-graph-impl-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/collections-generic-4.01.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

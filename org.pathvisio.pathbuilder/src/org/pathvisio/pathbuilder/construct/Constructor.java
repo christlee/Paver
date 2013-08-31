@@ -2,6 +2,10 @@ package org.pathvisio.pathbuilder.construct;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,22 +14,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bridgedb.AttributeMapper;
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.IDMapperStack;
+import org.pathvisio.core.data.GdbManager;
+import org.pathvisio.core.model.ConverterException;
 import org.pathvisio.core.model.DataNodeType;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.ObjectType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
+import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.pathbuilder.Connection;
 import org.pathvisio.pathbuilder.Node;
+import org.pathvisio.plugins.PathwayCommonsPppPlugin;
+import org.pathvisio.plugins.Suggestion.SuggestionException;
 
 //TODO: This package should take care of putting the nodes and edges on the screen in a structurized manner
 public class Constructor {
 	Map<String,Node> nodes;
-	IDMapperStack db;
+	GdbManager db;
 	Pathway pwy;
 	Map<Node,PathwayElement> pels;
 	Set<PathwayElement> lines;
@@ -38,12 +48,15 @@ public class Constructor {
 	private static int PLUSY = 50;
 	private static int CSIZE = 12;
 	
-	
-	public Constructor(Pathway pwy, IDMapperStack db,boolean newpwy){
+	public Constructor(Pathway pwy, GdbManager db){
 		this.db = db;
 		this.pwy = pwy;
-		this.newpwy = newpwy;
 		start = new Point(50,50);
+	}
+	
+	public Constructor(Pathway pwy, GdbManager db,boolean newpwy){
+		this(pwy,db);
+		this.newpwy = newpwy;
 	}
 	
 	public void plotConnections(List<Connection> connections){
@@ -193,7 +206,7 @@ public class Constructor {
 		pel.setMWidth(WEIGHT);
 	}
 	
-	PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, LineType ltype){
+	public PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, LineType ltype){
 		PathwayElement line = PathwayElement.createPathwayElement(ObjectType.LINE);
 		line.setGraphId(pwy.getUniqueGraphId());
 		
@@ -275,5 +288,61 @@ public class Constructor {
 			return true;
 		}
 		else return false;
+	}
+
+	public void findCons() throws SuggestionException {
+		PathwayCommonsPppPlugin pwcPpp = new PathwayCommonsPppPlugin(db, "ALL");
+		List<PathwayElement> pels = new ArrayList<PathwayElement>();
+		for (PathwayElement pel : pwy.getDataObjects()){
+			if (pel.getObjectType().equals(ObjectType.DATANODE)){
+				pels.add(pel);
+			}
+		}
+		
+		
+		for (PathwayElement node : pels){
+			Pathway matches = pwcPpp.doSuggestion(node);
+			File tmp;
+			try {
+				tmp = File.createTempFile("pwcppp", ".gpml");
+				matches.writeToXml(tmp, true);
+
+				BufferedReader br = new BufferedReader(new FileReader(tmp));
+				String line;
+				while ((line = br.readLine()) != null)
+				{
+					System.out.println (line);
+				
+
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (ConverterException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			for (PathwayElement match : matches.getDataObjects()){
+				System.out.println(match.getTextLabel());
+				
+				if (match.getObjectType().equals(ObjectType.DATANODE)){
+					try {
+						for (PathwayElement element : pels){
+							if (db.getCurrentGdb().getAttributes(match.getXref()).equals(db.getCurrentGdb().getAttributes(element.getXref()))){
+								
+								PathwayElement l = drawLine(node,element,LineType.ARROW);
+								pwy.add(l);
+							}
+						}
+						
+					} catch (IDMapperException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
 	}
 }
