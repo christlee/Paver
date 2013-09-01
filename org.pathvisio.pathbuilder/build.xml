@@ -25,6 +25,7 @@
 			<include name="org.eclipse.osgi.jar" />
 		</fileset>
 		<fileset dir="./lib">
+			<include name = "prefuse.jar"/>
 			<include name = "org.pathvisio.pathlayout-1.0.0.jar"/>
 		</fileset>	
 	</path>
@@ -40,6 +41,7 @@
 		</fail>
 		<copy toDir="build/lib">
 			<fileset dir="./lib">
+				<include name = "prefuse.jar"/>
 				<include name = "org.pathvisio.pathlayout-1.0.0.jar"/>
 			</fileset>
 		</copy>

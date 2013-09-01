@@ -2,10 +2,6 @@ package org.pathvisio.pathbuilder.construct;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,15 +13,12 @@ import java.util.Set;
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.pathvisio.core.data.GdbManager;
-import org.pathvisio.core.model.ConverterException;
 import org.pathvisio.core.model.DataNodeType;
 import org.pathvisio.core.model.LineType;
 import org.pathvisio.core.model.ObjectType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
-import org.pathvisio.plugins.PathwayCommonsPppPlugin;
-import org.pathvisio.plugins.Suggestion.SuggestionException;
 
 //TODO: This package should take care of putting the nodes and edges on the screen in a structurized manner
 public class Constructor {
@@ -283,61 +276,5 @@ public class Constructor {
 			return true;
 		}
 		else return false;
-	}
-
-	public void findCons() throws SuggestionException {
-		PathwayCommonsPppPlugin pwcPpp = new PathwayCommonsPppPlugin(db, "ALL");
-		List<PathwayElement> pels = new ArrayList<PathwayElement>();
-		for (PathwayElement pel : pwy.getDataObjects()){
-			if (pel.getObjectType().equals(ObjectType.DATANODE)){
-				pels.add(pel);
-			}
-		}
-		
-		
-		for (PathwayElement node : pels){
-			Pathway matches = pwcPpp.doSuggestion(node);
-			File tmp;
-			try {
-				tmp = File.createTempFile("pwcppp", ".gpml");
-				matches.writeToXml(tmp, true);
-
-				BufferedReader br = new BufferedReader(new FileReader(tmp));
-				String line;
-				while ((line = br.readLine()) != null)
-				{
-					System.out.println (line);
-				
-
-				}
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (ConverterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			for (PathwayElement match : matches.getDataObjects()){
-				System.out.println(match.getTextLabel());
-				
-				if (match.getObjectType().equals(ObjectType.DATANODE)){
-					try {
-						for (PathwayElement element : pels){
-							if (db.getCurrentGdb().getAttributes(match.getXref()).equals(db.getCurrentGdb().getAttributes(element.getXref()))){
-								
-								PathwayElement l = drawLine(node,element,LineType.ARROW);
-								pwy.add(l);
-							}
-						}
-						
-					} catch (IDMapperException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
 	}
 }
