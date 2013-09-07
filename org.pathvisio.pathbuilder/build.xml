@@ -4,11 +4,11 @@
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. -->
-<project basedir="." default="jar" name="org.pathvisio.pathbuilder">
+<project basedir="." default="jar" name="org.pathvisio.paver">
 	<property name="ant.build.javac.target" value="1.5" />
 	<property name="ant.build.javac.source" value="1.5" />
 
-	<property name="base.name" value="org.pathvisio.pathbuilder" />
+	<property name="base.name" value="org.pathvisio.paver" />
 	<property name="version" value="0.5.0" />
 	<property name="jar.name" value="${base.name}-${version}.jar" />
 	<property name="pathvisio.dir" value="../../PathVisio/" />

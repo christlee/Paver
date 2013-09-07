@@ -1,4 +1,4 @@
-package org.pathvisio.pathbuilder.construct;
+package org.pathvisio.paver.construct;
 
 import java.awt.Color;
 import java.awt.Point;

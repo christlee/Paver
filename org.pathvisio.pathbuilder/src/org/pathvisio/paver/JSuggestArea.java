@@ -1,4 +1,4 @@
-package org.pathvisio.pathbuilder;
+package org.pathvisio.paver;
 
 import java.awt.Dimension;
 import java.awt.Frame;

@@ -1,4 +1,4 @@
-package org.pathvisio.pathbuilder;
+package org.pathvisio.paver;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -36,10 +36,10 @@ import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
-import org.pathvisio.pathbuilder.PbPlugin.PbPreference;
-import org.pathvisio.pathbuilder.construct.Connection;
-import org.pathvisio.pathbuilder.construct.Constructor;
-import org.pathvisio.pathbuilder.construct.Node;
+import org.pathvisio.paver.PbPlugin.PbPreference;
+import org.pathvisio.paver.construct.Connection;
+import org.pathvisio.paver.construct.Constructor;
+import org.pathvisio.paver.construct.Node;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
