@@ -19,7 +19,7 @@
 package org.pathvisio.paver.construct;
 
 /**
- * Node Class<p>
+ * Node Class.<p>
  * Class for new nodes read by the plug-in, from which to create new PathwayElement objects
  * 
  * @author Christ Leemans

@@ -31,6 +31,7 @@ import org.pathvisio.paver.construct.Connection;
 import org.pathvisio.paver.construct.Node;
 
 /**
+* TxtReader Class.<p>
 * Text reader class for node or connection input by file. 
 * The manual input function also uses the static methods of this class. 
 * @author christ leemans

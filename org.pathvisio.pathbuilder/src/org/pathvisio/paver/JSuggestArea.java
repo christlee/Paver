@@ -47,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
 /**
+ * JSuggestArea Class.<p>
  * Provides a text-field that makes suggestions using a provided data-vector.
  * You might have seen this on Google (tm), this is the Java implementation.
  *
