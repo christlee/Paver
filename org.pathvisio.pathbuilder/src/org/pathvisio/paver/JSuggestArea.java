@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Paver,
+ * 
+ * a PathVisio plug-in to automate pathway creation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ ******************************************************************************/
 package org.pathvisio.paver;
 
 import java.awt.Dimension;
@@ -321,10 +339,11 @@ public class JSuggestArea extends JTextArea {
 	
 
 	/**
-	 * Sets new data used to suggest similar words.
+	 * Sets new data used to suggest similar words for the first word.
+	 * words are separated by tabs
 	 *
-	 * @param data
-	 *            Vector containing available words
+	 * @param first Vector containing available words
+	 * @param firstsuf suffix to put behind word when auto-completing
 	 * @return success, true unless the data-vector was null
 	 */
 	public boolean setSuggestFirst(Vector<String> first, String firstsuf) {
@@ -337,7 +356,14 @@ public class JSuggestArea extends JTextArea {
 		list.setListData(first);
 		return true;
 	}
-	
+	/**
+	 * Sets new data used to suggest similar words for the second word.
+	 * words are separated by tabs
+	 *
+	 * @param second Vector containing available words
+	 * @param secondsuf suffix to put behind word when auto-completing
+	 * @return success, true unless the data-vector was null
+	 */
 	public boolean setSuggestSecond(Vector<String> second, String secondsuf) {
 		if (second == null) {
 			return false;
@@ -345,9 +371,17 @@ public class JSuggestArea extends JTextArea {
 		this.secondsuf = secondsuf;
 		Collections.sort(second);
 		this.second = second;
-//		list.setListData(linetypes);
+		list.setListData(second);
 		return true;
 	}
+	/**
+	 * Sets new data used to suggest similar words for the third word.
+	 * words are separated by tabs
+	 *
+	 * @param third Vector containing available words
+	 * @param thirdsuf suffix to put behind word when auto-completing
+	 * @return success, true unless the data-vector was null
+	 */
 	public boolean setSuggestThird(Vector<String> third, String thirdsuf){
 		if (third == null){
 			return false;
@@ -359,6 +393,9 @@ public class JSuggestArea extends JTextArea {
 		return true;
 	}
 	
+	/**
+	 * empty all suggestions, so that new ones can be added
+	 */
 	public void clearSuggestions(){
 		first.clear();
 		second.clear();
@@ -369,10 +406,13 @@ public class JSuggestArea extends JTextArea {
 	 * Get all words that are available for suggestion.
 	 *
 	 * @return Vector containing Strings
+	 * @throws NumberFormatException if the integer is not between 0 and 3
 	 */
-	@SuppressWarnings("unchecked")
-	public Vector<String> getSuggestData() {
-		return (Vector<String>) first.clone();
+	public Vector<String> getSuggestData(int i) throws NumberFormatException {
+		if (i==0) return first;
+		else if (i==1) return second;
+		else if (i==2) return third;
+		else throw new NumberFormatException();
 	}
 
 	/**

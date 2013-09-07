@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pathbuilder
 Bundle-SymbolicName: org.pathvisio.paver
-Bundle-Version: 0.4.0
+Bundle-Version: 0.5.0
 Bundle-ClassPath: lib/,
  lib/org.pathvisio.pathlayout-1.0.0.jar,
  lib/PathwayLoom.jar,
