@@ -1,14 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pathbuilder
-Bundle-SymbolicName: org.pathvisio.pathbuilder
+Bundle-SymbolicName: org.pathvisio.paver
 Bundle-Version: 0.4.0
 Bundle-ClassPath: lib/,
  lib/org.pathvisio.pathlayout-1.0.0.jar,
  lib/PathwayLoom.jar,
  lib/prefuse.jar,
  .
-Bundle-Activator: org.pathvisio.pathbuilder.PbPlugin
+Bundle-Activator: org.pathvisio.paver.PbPlugin
 Import-Package: com.jgoodies.forms.layout,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: org.pathvisio.core;bundle-version="3.0.0",
