@@ -36,6 +36,7 @@ import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.pathlayout.LayoutManager.Layout;
 
 /**
+ * PbPlugin class.<p>
  * Main Plug-in Class with Activator.
  * 
  * @author Christ Leemans

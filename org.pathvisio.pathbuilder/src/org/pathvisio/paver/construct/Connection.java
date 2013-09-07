@@ -20,7 +20,7 @@ package org.pathvisio.paver.construct;
 
 import org.pathvisio.core.model.LineType;
 /**
- * Connection Class<p>
+ * Connection Class.<p>
  * A connection between two nodes
  * @author Christ Leemans
  *

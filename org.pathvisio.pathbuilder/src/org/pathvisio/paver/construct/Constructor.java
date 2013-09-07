@@ -38,7 +38,7 @@ import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
 /**
- * Constructor class<p>
+ * Constructor class.<p>
  * Class that takes care of putting the nodes and edges on the screen in a structured manner
  * @author Christ Leemans
  *
