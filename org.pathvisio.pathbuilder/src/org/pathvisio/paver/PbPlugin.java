@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Paver,
+ * 
+ * a PathVisio plug-in to automate pathway creation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ ******************************************************************************/
 package org.pathvisio.paver;
 
 import java.awt.BorderLayout;
@@ -17,6 +35,12 @@ import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.pathlayout.LayoutManager.Layout;
 
+/**
+ * Main Plug-in Class with Activator.
+ * 
+ * @author Christ Leemans
+ *
+ */
 public class PbPlugin implements Plugin, BundleActivator {
 
 	private static String PLUGIN_NAME = "PathBuilder";
@@ -28,6 +52,10 @@ public class PbPlugin implements Plugin, BundleActivator {
 	private JMenu subMenu;
 	private static BundleContext context;
 
+	/**
+	 * Enumerator with the actions that are available in the plug-in's subMenu.
+	 *
+	 */
 	public static enum Action
 	{
 		BUILD("Build new Pathway"),
@@ -46,7 +74,9 @@ public class PbPlugin implements Plugin, BundleActivator {
 	        return text;
 	    }
 	}
-	
+	/**
+	 * initiate the plug-in, adds new menu items and registers the plug-in.
+	 */
 	@Override
 	public void init(PvDesktop desktop) {
 		this.desktop = desktop;
@@ -78,9 +108,11 @@ public class PbPlugin implements Plugin, BundleActivator {
 			{
 			case BUILD:
 				frame = new JFrame("Build pathway");
+				InputWindow newWindow = new InputWindow(desktop,frame);
+				newWindow.newpwy(true);
 			
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.getContentPane().add(new InputWindow(desktop,frame,true), BorderLayout.CENTER);
+				frame.getContentPane().add(newWindow, BorderLayout.CENTER);
 				frame.pack();
 				frame.setLocationRelativeTo(desktop.getFrame());
 				frame.setVisible(true);
@@ -91,8 +123,10 @@ public class PbPlugin implements Plugin, BundleActivator {
 				break;
 			case ADD:
 				frame = new JFrame("Add to existing pathway");
+				InputWindow addWindow = new InputWindow(desktop,frame);
+				addWindow.newpwy(true);
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.getContentPane().add(new InputWindow(desktop,frame,false), BorderLayout.CENTER);
+				frame.getContentPane().add(addWindow, BorderLayout.CENTER);
 				frame.pack();
 				frame.setLocationRelativeTo(desktop.getFrame());
 				frame.setVisible(true);
@@ -104,7 +138,10 @@ public class PbPlugin implements Plugin, BundleActivator {
 			}
 		}
 	}
-	
+	/**
+	 * enumerator used to set preference's
+	 *
+	 */
 	public static enum PbPreference implements Preference
 	{
 		PB_PLUGIN_TXT_FILE(System.getProperty("user.home") + File.separator + "text_file.txt");

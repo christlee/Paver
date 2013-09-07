@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Paver,
+ * 
+ * a PathVisio plug-in to automate pathway creation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ ******************************************************************************/
 package org.pathvisio.paver.construct;
 
 import java.awt.Color;
@@ -19,8 +37,12 @@ import org.pathvisio.core.model.ObjectType;
 import org.pathvisio.core.model.Pathway;
 import org.pathvisio.core.model.PathwayElement;
 import org.pathvisio.core.view.MIMShapes;
-
-//TODO: This package should take care of putting the nodes and edges on the screen in a structurized manner
+/**
+ * Constructor class<p>
+ * Class that takes care of putting the nodes and edges on the screen in a structured manner
+ * @author Christ Leemans
+ *
+ */
 public class Constructor {
 	Map<String,Node> nodes;
 	GdbManager db;
@@ -36,17 +58,34 @@ public class Constructor {
 	private static int PLUSY = 50;
 	private static int CSIZE = 12;
 	
+	/**
+	 * Create a new constructor
+	 * 
+	 * @param pwy The current pathway
+	 * @param db The GdbManager
+	 */
 	public Constructor(Pathway pwy, GdbManager db){
 		this.db = db;
 		this.pwy = pwy;
 		start = new Point(50,50);
 	}
-	
+	/**
+	 * Create a new constructor
+	 * 
+	 * @param pwy The current pathway
+	 * @param db The GdbManager
+	 * @param newpwy boolean representing if it's an empty pathway.
+	 * If not, new nodes should be added on the right side of the already existing ones.
+	 */
 	public Constructor(Pathway pwy, GdbManager db,boolean newpwy){
 		this(pwy,db);
 		this.newpwy = newpwy;
 	}
-	
+	/**
+	 * Plot connections on a pathway, if there are lots of connections, they are 
+	 * plotted in separate columns
+	 * @param connections List of connections
+	 */
 	public void plotConnections(List<Connection> connections){
 		nodes = new HashMap<String,Node>();
 		pels = new HashMap<Node,PathwayElement>();
@@ -71,9 +110,7 @@ public class Constructor {
 				col.add(connections.get(index));
 				index++;
 			}
-			double startj = j-0.5;
-			double endj = j+0.5;
-			plotConColumn(col,startj,endj);
+			plotConColumn(col,j);
 			j = j+2;
 		}
 		//then the last column, this one might be incomplete
@@ -83,9 +120,7 @@ public class Constructor {
 			lastCol.add(connections.get(index));
 			index++;
 		}
-		double startj = j-0.5;
-		double endj = j+0.5;
-		plotConColumn(lastCol,startj,endj);
+		plotConColumn(lastCol,j);
 		
 		for (Entry<Node,PathwayElement> entry : pels.entrySet()){
 			pwy.add(entry.getValue());
@@ -94,9 +129,15 @@ public class Constructor {
 			pwy.add(line);
 		}
 	}
-	
-	public void plotConColumn(List<Connection> connections,double startj, double endj){
+	/**
+	 * plot a single column of connections
+	 * @param connections List of connections
+	 * @param j number used to calculate the location of the nodes on the x-axis
+	 */
+	public void plotConColumn(List<Connection> connections,double j){
 		int i = 0;
+		double startj = j-0.5;
+		double endj = j+0.5;
 		for (Connection connection : connections){
 			Node start = connection.getStart();
 			if (!nodes.containsValue(start)){
@@ -132,7 +173,11 @@ public class Constructor {
 			i++;
 		}
 	}
-	
+	/**
+	 * Plot nodes on a pathway, if there are lots of nodes, they are 
+	 * plotted in separate columns
+	 * @param nodes List of nodes
+	 */
 	public void plotNodes(List<Node> nodes){
 		float j = 0;
 		int index = 0;
@@ -166,7 +211,11 @@ public class Constructor {
 		plotNodeColumn(lastCol,j);
 		
 	}
-	
+	/**
+	 * plot a single column of nodes
+	 * @param nodes List of nodes
+	 * @param j number used to calculate the location of the nodes on the x-axis
+	 */
 	public void plotNodeColumn(List<Node> nodes,float j){
 		int i = 0;
 		for (Node node: nodes){
@@ -184,7 +233,7 @@ public class Constructor {
 		}
 	}
 	
-	void drawNode(int i, double j, PathwayElement pel){
+	private void drawNode(int i, double j, PathwayElement pel){
 		int x = (int)(start.x + PLUSX * j);
 		
 		int y = start.y + PLUSY * i;
@@ -194,7 +243,7 @@ public class Constructor {
 		pel.setMWidth(WEIGHT);
 	}
 	
-	public PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, LineType ltype){
+	private PathwayElement drawLine(PathwayElement startnode, PathwayElement endnode, LineType ltype){
 		PathwayElement line = PathwayElement.createPathwayElement(ObjectType.LINE);
 		line.setGraphId(pwy.getUniqueGraphId());
 		
@@ -234,12 +283,17 @@ public class Constructor {
 		return line;
 	}
 	
-	
+	/**
+	 * set value to start the calculation of locations on the x-axis. In case of a new
+	 * pathway it should be the centre of the pathway window. But if nodes/connections
+	 * are added to an existing pathway its the starting point of new node creation.
+	 * @param x integer value to start the calculation
+	 */
 	public void setStartX(int x){
 		start.setLocation(x,start.y);
 	}
 	
-	PathwayElement createNode(Node node) throws IDMapperException{
+	private PathwayElement createNode(Node node) throws IDMapperException{
 		PathwayElement pel;
 		pel = PathwayElement.createPathwayElement(ObjectType.DATANODE);
 		pel.setGraphId(pwy.getUniqueGroupId());
@@ -249,14 +303,6 @@ public class Constructor {
 		}
 		if (!node.getSysCode().equals("NULL")){
 			DataSource source = DataSource.getBySystemCode(node.getSysCode());
-//			if (source.getType().equals(GENE)){
-//				pel.setDataNodeType("GeneProduct");
-//			}
-//			else if (source.getType().equals(METABOLITE)){
-//				pel.setDataNodeType("Metabolite");
-//			}
-//			pel.setDataNodeType(source.getType());
-			
 			if (source.isMetabolite()){
 				pel.setColor(Color.BLUE);
 				pel.setDataNodeType(DataNodeType.METABOLITE);
@@ -269,6 +315,12 @@ public class Constructor {
 		
 		return pel;
 	}
+	/**
+	 * check if the line-type should be displayed on both the start and end side of
+	 * the connecting line. If not, the line-type is displayed on the end side of the line.
+	 * @param lt a line-type
+	 * @return <i>True</i> if both ways or <i>False</i> if not
+	 */
 	public static boolean isBothWays(LineType lt){
 		if (lt.equals(MIMShapes.MIM_BINDING)||
 			lt.equals(MIMShapes.MIM_COVALENT_BOND)||

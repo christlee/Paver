@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Paver,
+ * 
+ * a PathVisio plug-in to automate pathway creation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ ******************************************************************************/
 package org.pathvisio.paver;
 
 import java.io.BufferedReader;
@@ -13,34 +31,43 @@ import org.pathvisio.paver.construct.Connection;
 import org.pathvisio.paver.construct.Node;
 
 /**
-* TODO: description
+* Text reader class for node or connection input by file. 
+* The manual input function also uses the static methods of this class. 
 * @author christ leemans
 *
 */
 public class TxtReader 
 {
-	File file;
-	InputWindow window;
+	private File file;
+	private InputWindow window;
 	private static String NAME_SEP = ":";
 	private static String ITEM_SEP = "\t";
 	
+	/**
+	 * create a new text reader to read file input
+	 * @param file
+	 */
 	public TxtReader(File file)
 	{
 		this.file = file;
 		window = new InputWindow();
 	}
 	
+	/**
+	 * add the input window object that implements the text reader.
+	 * @param window The input window
+	 */
 	public void addWindow(InputWindow window){
 		this.window = window;
 	}
 	
-	public List<Connection> getConnections()
-	{
+	/**
+	 * get the connections from the text file
+	 * @return List of connections
+	 */
+	public List<Connection> getConnections(){
 		List<Connection> cons = new ArrayList<Connection>();
-		// line string
 		String line; 
-		
-					
 		try 
 		{
 			FileReader fr = new FileReader(file);
@@ -59,11 +86,14 @@ public class TxtReader
 		{
 			System.out.println("Exception: " + e);
 		}		
-	return cons;
+		return cons;
 	}
+	/**
+	 * get the nodes from the text file
+	 * @return List of nodes
+	 */
 	public List<Node> getNodes(){
 		List<Node> nodes = new ArrayList<Node>();
-		// line string
 		String line; 
 							
 		try 
@@ -88,7 +118,12 @@ public class TxtReader
 		
 		return nodes;
 	}
-	
+	/**
+	 * Static method to read a string object representing a connection between 2 data nodes
+	 * @param line the line to process
+	 * @param window the implementing input window
+	 * @return the connection
+	 */
 	public static Connection readConnection(String line, InputWindow window){
 		// the array to return
 		String[] currentRow;
@@ -117,6 +152,12 @@ public class TxtReader
 		return con;
 	}
 	
+	/**
+	 * static method to read a string object representing a data node
+	 * @param line the line to process
+	 * @param window the implementing input window
+	 * @return the node
+	 */
 	public static Node readSingleNode(String line,InputWindow window){
 		String[] att = line.split("\t");
 		if (att.length==3){

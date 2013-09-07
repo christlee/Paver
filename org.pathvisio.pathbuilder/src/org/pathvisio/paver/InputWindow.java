@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Paver,
+ * 
+ * a PathVisio plug-in to automate pathway creation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ ******************************************************************************/
 package org.pathvisio.paver;
 
 import java.awt.BorderLayout;
@@ -44,6 +62,12 @@ import org.pathvisio.paver.construct.Node;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+/**
+ * The input window.<p>
+ * Class creates a frame with the elements to enable user input.
+ * @author Christ Leemans
+ */
+
 public class InputWindow extends JPanel implements ActionListener{
 	
 	private JButton btnBrowseFile;
@@ -68,13 +92,14 @@ public class InputWindow extends JPanel implements ActionListener{
     static String nodesString = "Nodes";
     
     /**
-	 * The input window.<p>
-	 * Class creates a frame with the elements to enable user input.
-	 */
-	InputWindow(PvDesktop desktop,JFrame frame,boolean newpwy){
+     * create a new input window.
+     * @param desktop the main PvDesktop object
+     * @param frame the frame to which the input window is added
+     */
+	InputWindow(PvDesktop desktop,JFrame frame){
 		this.swingEngine = desktop.getSwingEngine();
 		this.frame = frame;
-		this.newpwy = newpwy;
+		this.newpwy = false;
 		side=desktop.getSideBarTabbedPane().getWidth();
 		findLineTypes();
 		
@@ -183,11 +208,6 @@ public class InputWindow extends JPanel implements ActionListener{
 		
 		inputText = new JSuggestArea(7,10,frame);
 		
-		if (conButton.isSelected()){
-			
-		}
-		
-		
 	    JScrollPane scrollingArea = new JScrollPane(inputText);
 	    
 	    inputPanel.setBorder (BorderFactory.createTitledBorder(etch, "Manual input"));
@@ -225,9 +245,22 @@ public class InputWindow extends JPanel implements ActionListener{
 		
 		add(panel, BorderLayout.CENTER);
 	}
-	
+	/**
+	 * create an empty instance of the input window
+	 */
 	InputWindow(){
 		
+	}
+	
+	/**
+	 * set option to either create a new pathway created or 
+	 * add new nodes to the existing pathway
+	 * 
+     * @param newpwy boolean representing yes on no on whether 
+     * to create a new pathway
+	 */
+	public void newpwy(boolean newpwy){
+		this.newpwy=newpwy;
 	}
 	
 	public JPopupMenu processMouseEvent()
@@ -320,6 +353,10 @@ public class InputWindow extends JPanel implements ActionListener{
 			}
 		}
 	}
+	/**
+	 * get all possible MIM-types and the normal arrow line-type
+	 * @return List with line-types
+	 */
 	protected List<LineType> getLineTypes(){
 		return lineTypes;
 	}
@@ -343,7 +380,10 @@ public class InputWindow extends JPanel implements ActionListener{
 		}
 		return cons;
 	}
-	
+	/**
+	 * Reaction to user selections being made regarding radio-buttons 
+	 * and the auto-complete function
+	 */
 	public void actionPerformed(ActionEvent e) { 
 		if(e.getActionCommand()==manualString){
         	inputText.setEnabled(true);
@@ -396,6 +436,10 @@ public class InputWindow extends JPanel implements ActionListener{
         }
     }
 	
+	/**
+	 * method for displaying error messages
+	 * @param message the message being displayed in the error
+	 */
 	public void showMessageDialog(String message) 
 	{
 		JOptionPane.showMessageDialog(this, message, message, JOptionPane.ERROR_MESSAGE);
