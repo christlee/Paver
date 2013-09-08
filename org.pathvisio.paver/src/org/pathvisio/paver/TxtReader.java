@@ -37,10 +37,10 @@ import org.pathvisio.paver.construct.Node;
 * @author christ leemans
 *
 */
-public class TxtReader 
+public class TxtReader
 {
 	private File file;
-	private InputWindow window;
+	private List<LineType> lineTypes;
 	private static String NAME_SEP = ":";
 	private static String ITEM_SEP = "\t";
 	
@@ -51,22 +51,22 @@ public class TxtReader
 	public TxtReader(File file)
 	{
 		this.file = file;
-		window = new InputWindow();
+		lineTypes = new ArrayList<LineType>();
 	}
 	
 	/**
-	 * add the input window object that implements the text reader.
-	 * @param window The input window
+	 * add possible linetypes to check
+	 * @param linetypes The possible linetypes
 	 */
-	public void addWindow(InputWindow window){
-		this.window = window;
+	public void addLineTypes(List<LineType> lineTypes){
+		this.lineTypes = lineTypes;
 	}
 	
 	/**
 	 * get the connections from the text file
 	 * @return List of connections
 	 */
-	public List<Connection> getConnections(){
+	public List<Connection> getConnections() throws IllegalArgumentException{
 		List<Connection> cons = new ArrayList<Connection>();
 		String line; 
 		try 
@@ -77,12 +77,15 @@ public class TxtReader
 			// continue reading lines until EOF is reached
 			while((line = br.readLine()) != null)
 			{
-			   	Connection con = TxtReader.readConnection(line, window);
+			   	Connection con = TxtReader.readConnection(line, lineTypes);
 			   	cons.add(con);
 			   	   	
 			}   
 			fr.close();
-		}		     
+		}
+		catch(IllegalArgumentException e){
+			throw e;
+		}
 		catch(Exception e) 
 		{
 			System.out.println("Exception: " + e);
@@ -93,7 +96,7 @@ public class TxtReader
 	 * get the nodes from the text file
 	 * @return List of nodes
 	 */
-	public List<Node> getNodes(){
+	public List<Node> getNodes() throws IllegalArgumentException{
 		List<Node> nodes = new ArrayList<Node>();
 		String line; 
 							
@@ -105,13 +108,16 @@ public class TxtReader
 			// continue reading lines until EOF is reached
 			while((line = br.readLine()) != null)
 			{
-				Node node = readSingleNode(line,window);
+				Node node = readSingleNode(line);
 				
 				nodes.add(node);
 					   	   	
 			}   
 			fr.close();
-		}		     
+		}
+		catch(IllegalArgumentException e){
+			throw e;
+		}
 		catch(Exception e) 
 		{
 			System.out.println("Exception: " + e);
@@ -125,15 +131,13 @@ public class TxtReader
 	 * @param window the implementing input window
 	 * @return the connection
 	 */
-	public static Connection readConnection(String line, InputWindow window){
+	public static Connection readConnection(String line, List<LineType> lineTypes) throws IllegalArgumentException{
 		// the array to return
 		String[] currentRow;
-		List<LineType> lineTypes = window.getLineTypes();
 
 		currentRow=line.split(ITEM_SEP);
 		if (currentRow.length!=3){
-			window.showMessageDialog("Incorrect input!");
-			return null;
+			throw new IllegalArgumentException();
 		}
 		String[] start = currentRow[0].split(NAME_SEP);
 		String startname = start[0] + ":" + start[1];
@@ -159,7 +163,7 @@ public class TxtReader
 	 * @param window the implementing input window
 	 * @return the node
 	 */
-	public static Node readSingleNode(String line,InputWindow window){
+	public static Node readSingleNode(String line) throws IllegalArgumentException{
 		String[] att = line.split("\t");
 		if (att.length==3){
 			//it could be a system code
@@ -211,8 +215,7 @@ public class TxtReader
 			return new Node(name,id,sysCode);
 		}
 		else {
-			window.showMessageDialog("Incorrect input!");
-			return null;
+			throw new IllegalArgumentException();
 		}
 	}
 }

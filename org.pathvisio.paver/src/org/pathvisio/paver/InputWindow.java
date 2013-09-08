@@ -101,7 +101,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		this.frame = frame;
 		this.newpwy = false;
 		side=desktop.getSideBarTabbedPane().getWidth();
-		findLineTypes();
+		lineTypes = findLineTypes();
 		
 		txtFile = new JTextField();
 		txtFile.setText(PreferenceManager.getCurrent().get(PbPreference.PB_PLUGIN_TXT_FILE));
@@ -198,7 +198,12 @@ public class InputWindow extends JPanel implements ActionListener{
 		{
 			public void actionPerformed (ActionEvent ae)
 			{
-				doBuild();
+				try{
+					doBuild();
+				}
+				catch(IllegalArgumentException e){
+					showMessageDialog("Invalid input!");
+				}
 			}
 		});
 		nodeNames = new JLabel("<html> Enter the genes here <br> " +
@@ -285,7 +290,7 @@ public class InputWindow extends JPanel implements ActionListener{
 		return menu;
 	}
 	
-	private void doBuild() 
+	private void doBuild() throws IllegalArgumentException
 	{	
 		List<Connection> cons = new ArrayList<Connection>();
 		List<Node> nodes = new ArrayList<Node>();
@@ -299,7 +304,7 @@ public class InputWindow extends JPanel implements ActionListener{
 			}
 			PreferenceManager.getCurrent().set(PbPreference.PB_PLUGIN_TXT_FILE, txtFile.getText());
 			TxtReader read = new TxtReader(textF);
-			read.addWindow(this);
+			read.addLineTypes(lineTypes);
 			if (conButton.isSelected()){
 				cons = read.getConnections();	
 			}
@@ -335,8 +340,8 @@ public class InputWindow extends JPanel implements ActionListener{
 		frame.dispose();
 	}
 	
-	private void findLineTypes(){
-		lineTypes = new ArrayList<LineType>();
+	private static List<LineType> findLineTypes(){
+		List<LineType> lineTypes = new ArrayList<LineType>();
 		lineTypes.add(LineType.ARROW);
 		for (Field field: MIMShapes.class.getDeclaredFields()){
 			if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) &&
@@ -352,6 +357,7 @@ public class InputWindow extends JPanel implements ActionListener{
 				}
 			}
 		}
+		return lineTypes;
 	}
 	/**
 	 * get all possible MIM-types and the normal arrow line-type
@@ -361,22 +367,23 @@ public class InputWindow extends JPanel implements ActionListener{
 		return lineTypes;
 	}
 	
-	private List<Node> getNodes(){
+	private List<Node> getNodes() throws IllegalArgumentException{
 		List<Node> nodes = new ArrayList<Node>();
 		String[] geneList = inputText.getText().split("\r\n|\r|\n");
 		for (int i=0; i<geneList.length;i++){
-			Node node = TxtReader.readSingleNode(geneList[i],this);
+			Node node = TxtReader.readSingleNode(geneList[i]);
 			nodes.add(node);
 		}
 		return nodes;
 	}
 	
-	private List<Connection> getCons(){
+	private List<Connection> getCons() throws IllegalArgumentException{
 		List<Connection> cons = new ArrayList<Connection>();
 		String[] geneList = inputText.getText().split("\r\n|\r|\n");
 		for (int i=0; i<geneList.length;i++){
-			Connection con = TxtReader.readConnection(geneList[i],this);
+			Connection con = TxtReader.readConnection(geneList[i],lineTypes);
 			cons.add(con);
+			
 		}
 		return cons;
 	}
