@@ -54,7 +54,7 @@ import org.pathvisio.core.view.MIMShapes;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.util.BrowseButtonActionListener;
 import org.pathvisio.gui.SwingEngine;
-import org.pathvisio.paver.PbPlugin.PbPreference;
+import org.pathvisio.paver.PaverPlugin.PbPreference;
 import org.pathvisio.paver.construct.Connection;
 import org.pathvisio.paver.construct.Constructor;
 import org.pathvisio.paver.construct.Node;
