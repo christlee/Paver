@@ -8,7 +8,7 @@ Bundle-ClassPath: lib/,
  lib/PathwayLoom.jar,
  lib/prefuse.jar,
  .
-Bundle-Activator: org.pathvisio.paver.PbPlugin
+Bundle-Activator: org.pathvisio.paver.PaverPlugin
 Import-Package: com.jgoodies.forms.layout,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: org.pathvisio.core;bundle-version="3.0.0",

@@ -36,15 +36,15 @@ import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.pathlayout.LayoutManager.Layout;
 
 /**
- * PbPlugin class.<p>
+ * PaverPlugin class.<p>
  * Main Plug-in Class with Activator.
  * 
  * @author Christ Leemans
  *
  */
-public class PbPlugin implements Plugin, BundleActivator {
+public class PaverPlugin implements Plugin, BundleActivator {
 
-	private static String PLUGIN_NAME = "PathBuilder";
+	private static String PLUGIN_NAME = "Paver";
 	private Layout layout;
 	
 	protected List<LineType> lineTypes;
